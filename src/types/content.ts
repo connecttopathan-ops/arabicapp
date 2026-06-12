@@ -1,0 +1,60 @@
+/**
+ * Domain types for MASAR content.
+ *
+ * These describe the *shape* of data the UI consumes. They are deliberately
+ * decoupled from where the data comes from — today it's hardcoded, tomorrow
+ * it's Supabase. Keep these stable and the rest of the app barely changes.
+ */
+import type { JewelTone } from '@/theme';
+import type { ComponentProps } from 'react';
+import type { Ionicons } from '@expo/vector-icons';
+
+/** Any valid Ionicons glyph name (gives us autocomplete + type safety). */
+export type IconName = ComponentProps<typeof Ionicons>['name'];
+
+export interface UserProgress {
+  /** Display name used in the welcome message. */
+  name: string;
+  /** Consecutive days studied. */
+  streakDays: number;
+  /** Current level number. */
+  level: number;
+  /** Human label for the level, e.g. "Beginner Reader". */
+  levelTitle: string;
+  /** XP earned toward the current level. */
+  xp: number;
+  /** XP required to reach the next level. */
+  xpToNext: number;
+}
+
+export interface StatSummary {
+  lettersLearned: number;
+  wordsLearned: number;
+  lessonsCompleted: number;
+}
+
+export interface ContinueLesson {
+  id: string;
+  title: string;
+  /** Arabic title, rendered RTL in Naskh. */
+  arabicTitle: string;
+  subtitle: string;
+  /** Completion ratio from 0 to 1. */
+  progress: number;
+}
+
+export interface Topic {
+  id: string;
+  title: string;
+  subtitle: string;
+  icon: IconName;
+  tone: JewelTone;
+}
+
+/** The full payload the Home screen needs. One fetch, everything below. */
+export interface HomeData {
+  progress: UserProgress;
+  stats: StatSummary;
+  continueLesson: ContinueLesson;
+  topics: Topic[];
+}
