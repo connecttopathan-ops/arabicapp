@@ -15,6 +15,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
+import { ProgressProvider } from '@/context/ProgressContext';
 import { colors, fontAssets } from '@/theme';
 
 SplashScreen.preventAutoHideAsync();
@@ -63,8 +64,10 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
         <AuthProvider>
-          <StatusBar style="light" />
-          <RootNavigator />
+          <ProgressProvider>
+            <StatusBar style="light" />
+            <RootNavigator />
+          </ProgressProvider>
         </AuthProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>

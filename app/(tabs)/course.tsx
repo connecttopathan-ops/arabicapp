@@ -15,11 +15,13 @@ import {
   WordRow,
 } from '@/components';
 import { useLetters, useWords } from '@/hooks/useContent';
+import { useProgress } from '@/context/ProgressContext';
 import { colors, spacing } from '@/theme';
 
 export default function CourseScreen() {
   const letters = useLetters();
   const words = useWords();
+  const { isLearned, toggle } = useProgress();
 
   const loading = letters.loading || words.loading;
   const offline = letters.offline || words.offline;
@@ -39,7 +41,8 @@ export default function CourseScreen() {
     <Screen>
       <AppText variant="title">Course</AppText>
       <AppText variant="body" color="textMuted" style={styles.intro}>
-        The Arabic alphabet and your starter vocabulary.
+        The Arabic alphabet and your starter vocabulary. Tap an item to mark it
+        as learned.
       </AppText>
 
       {offline ? (
@@ -56,7 +59,11 @@ export default function CourseScreen() {
         <View style={styles.grid}>
           {letters.data.map((letter) => (
             <View key={letter.id} style={styles.gridItem}>
-              <LetterTile letter={letter} />
+              <LetterTile
+                letter={letter}
+                learned={isLearned('letter', letter.id)}
+                onPress={() => toggle('letter', letter.id)}
+              />
             </View>
           ))}
         </View>
@@ -66,7 +73,12 @@ export default function CourseScreen() {
         <SectionHeader title={`Vocabulary · ${words.data.length} words`} />
         <View style={styles.list}>
           {words.data.map((word) => (
-            <WordRow key={word.id} word={word} />
+            <WordRow
+              key={word.id}
+              word={word}
+              learned={isLearned('word', word.id)}
+              onPress={() => toggle('word', word.id)}
+            />
           ))}
         </View>
       </View>

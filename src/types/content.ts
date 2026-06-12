@@ -79,6 +79,9 @@ export interface Letter {
   pronunciation: string | null;
 }
 
+/** The kinds of item a user can mark as learned (matches user_progress). */
+export type ProgressItemType = 'letter' | 'word' | 'sentence';
+
 /** A row from the `words` table. */
 export interface Word {
   id: string;

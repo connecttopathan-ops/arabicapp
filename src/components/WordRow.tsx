@@ -1,16 +1,42 @@
 /**
  * WordRow — one vocabulary entry: Arabic on the right, transliteration and
- * English gloss on the left, with a small CEFR-level chip.
+ * English gloss on the left, with a small CEFR-level chip. Tappable to toggle
+ * "learned" (gold ring + check icon).
  */
-import { View, StyleSheet } from 'react-native';
+import { Pressable, View, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { ArabicText } from './ArabicText';
 import { AppText } from './AppText';
 import { colors, radius, spacing } from '@/theme';
 import type { Word } from '@/types/content';
 
-export function WordRow({ word }: { word: Word }) {
+interface WordRowProps {
+  word: Word;
+  learned?: boolean;
+  onPress?: () => void;
+}
+
+export function WordRow({ word, learned = false, onPress }: WordRowProps) {
   return (
-    <View style={styles.row}>
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityState={{ selected: learned }}
+      accessibilityLabel={`${word.english ?? word.transliteration ?? 'word'}${learned ? ', learned' : ''}`}
+      style={({ pressed }) => [
+        styles.row,
+        learned && styles.rowLearned,
+        pressed && styles.pressed,
+      ]}
+    >
+      <View style={styles.check}>
+        <Ionicons
+          name={learned ? 'checkmark-circle' : 'ellipse-outline'}
+          size={22}
+          color={learned ? colors.primary : colors.textFaint}
+        />
+      </View>
+
       <View style={styles.left}>
         <View style={styles.glossRow}>
           <AppText variant="bodyStrong" numberOfLines={1}>
@@ -35,7 +61,7 @@ export function WordRow({ word }: { word: Word }) {
       <ArabicText variant="arabicBody" style={styles.arabic} numberOfLines={1}>
         {word.arabic}
       </ArabicText>
-    </View>
+    </Pressable>
   );
 }
 
@@ -43,14 +69,22 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: spacing.lg,
+    gap: spacing.md,
     backgroundColor: colors.card,
     borderRadius: radius.lg,
-    borderWidth: StyleSheet.hairlineWidth,
+    borderWidth: 1,
     borderColor: colors.border,
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.lg,
+  },
+  rowLearned: {
+    borderColor: colors.primary,
+  },
+  pressed: {
+    opacity: 0.85,
+  },
+  check: {
+    width: 22,
   },
   left: {
     flex: 1,
@@ -68,6 +102,6 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
   },
   arabic: {
-    minWidth: 80,
+    minWidth: 70,
   },
 });
