@@ -75,6 +75,33 @@ The app is structured so the backend swap touches **one layer**:
 - **Fonts:** Marcellus (display serif), Figtree (body sans), Noto Naskh Arabic
   (renders right-to-left via the `<ArabicText>` component).
 
+## Building an installable APK (Android)
+
+The app builds in the cloud with **EAS Build** (free tier). You need a free
+Expo account — no Android SDK required on your machine.
+
+```bash
+# 1. Create a free account at https://expo.dev, then log in:
+npx eas-cli login
+
+# 2. First time only — links this project to your Expo account:
+npx eas-cli init
+
+# 3. Build an installable APK (the "preview" profile in eas.json):
+npx eas-cli build -p android --profile preview
+```
+
+When the build finishes, EAS prints a URL (and a QR code). Open it on your
+Android phone to download the `.apk`, then install it — you may need to allow
+"Install from unknown sources" the first time.
+
+Build profiles live in `eas.json`:
+- **preview** → `.apk` for sideloading / sharing with testers
+- **production** → `.aab` (Android App Bundle) for the Google Play Store
+
+> iOS note: installable iOS builds require an Apple Developer account ($99/yr).
+> Until then, use Expo Go for iPhone testing.
+
 ## Useful commands
 
 ```bash

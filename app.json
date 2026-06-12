@@ -18,6 +18,8 @@
       "supportsTablet": true
     },
     "android": {
+      "package": "com.masar.app",
+      "versionCode": 1,
       "userInterfaceStyle": "dark",
       "adaptiveIcon": {
         "backgroundColor": "#1A1512",
