@@ -58,3 +58,36 @@ export interface HomeData {
   continueLesson: ContinueLesson;
   topics: Topic[];
 }
+
+/** The four positional shapes an Arabic letter takes when joined. */
+export interface LetterForms {
+  isolated: string;
+  initial: string;
+  medial: string;
+  final: string;
+}
+
+/** A row from the `letters` table. */
+export interface Letter {
+  id: string;
+  position: number;
+  name: string;
+  /** Isolated glyph, e.g. "ب". */
+  letter: string;
+  transliteration: string | null;
+  forms: LetterForms | null;
+  pronunciation: string | null;
+}
+
+/** A row from the `words` table. */
+export interface Word {
+  id: string;
+  /** Arabic with harakat. */
+  arabic: string;
+  transliteration: string | null;
+  english: string | null;
+  root: string | null;
+  category: string | null;
+  cefrLevel: string | null;
+  frequencyRank: number | null;
+}
