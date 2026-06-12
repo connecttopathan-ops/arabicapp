@@ -1,7 +1,7 @@
 /**
  * Progress service — saves and loads which items a user has learned.
  *
- * Two backends, chosen by whether there's a real account:
+ * Two backends, chosen by whether there's a real account (a non-null userId):
  *   - Signed in  -> the `user_progress` table in Supabase (syncs across
  *                   devices; RLS ensures a user only sees their own rows).
  *   - Guest      -> a local list on the device (so the feature still works
@@ -21,8 +21,8 @@ export function progressKey(type: ProgressItemType, id: string): string {
 }
 
 /** Load all learned-item keys for the current user (or guest). */
-export async function loadProgress(signedIn: boolean): Promise<string[]> {
-  if (signedIn) {
+export async function loadProgress(userId: string | null): Promise<string[]> {
+  if (userId) {
     const { data, error } = await supabase
       .from('user_progress')
       .select('item_type, item_id');
@@ -34,27 +34,27 @@ export async function loadProgress(signedIn: boolean): Promise<string[]> {
 
 /**
  * Persist a single learned/unlearned change.
- * For guests we save the whole updated list; for signed-in users we make a
- * targeted insert (upsert) or delete so it round-trips to other devices.
+ * For guests we save the whole updated list locally; for signed-in users we
+ * make a targeted insert (upsert) or delete so it round-trips to other devices.
+ * We set `user_id` explicitly so the write never depends on the column default.
  */
 export async function persistLearned(
-  signedIn: boolean,
+  userId: string | null,
   type: ProgressItemType,
   id: string,
   learned: boolean,
   allKeysAfterChange: string[],
 ): Promise<void> {
-  if (!signedIn) {
+  if (!userId) {
     await cacheSet(GUEST_KEY, allKeysAfterChange);
     return;
   }
 
   if (learned) {
-    // user_id defaults to auth.uid() in the DB, so we don't send it here.
     const { error } = await supabase
       .from('user_progress')
       .upsert(
-        { item_type: type, item_id: id, status: 'learned' },
+        { user_id: userId, item_type: type, item_id: id, status: 'learned' },
         { onConflict: 'user_id,item_type,item_id' },
       );
     if (error) throw error;
@@ -62,6 +62,7 @@ export async function persistLearned(
     const { error } = await supabase
       .from('user_progress')
       .delete()
+      .eq('user_id', userId)
       .eq('item_type', type)
       .eq('item_id', id);
     if (error) throw error;

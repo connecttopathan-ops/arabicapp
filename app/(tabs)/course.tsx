@@ -111,7 +111,9 @@ const styles = StyleSheet.create({
     marginTop: spacing.xl,
   },
   grid: {
-    flexDirection: 'row',
+    // Arabic reads right-to-left: lay the alphabet out so Alif is top-right
+    // and the sequence flows leftward, wrapping downward.
+    flexDirection: 'row-reverse',
     flexWrap: 'wrap',
     gap: spacing.sm,
   },

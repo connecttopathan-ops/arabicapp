@@ -30,7 +30,7 @@ const ProgressContext = createContext<ProgressContextValue | undefined>(undefine
 
 export function ProgressProvider({ children }: { children: ReactNode }) {
   const { session, initializing } = useAuth();
-  const signedIn = !!session;
+  const userId = session?.user?.id ?? null;
 
   const [learnedKeys, setLearnedKeys] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
@@ -40,7 +40,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     if (initializing) return;
     let active = true;
     setLoading(true);
-    loadProgress(signedIn)
+    loadProgress(userId)
       .then((keys) => {
         if (active) {
           setLearnedKeys(new Set(keys));
@@ -53,7 +53,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     return () => {
       active = false;
     };
-  }, [signedIn, initializing]);
+  }, [userId, initializing]);
 
   const isLearned = useCallback(
     (type: ProgressItemType, id: string) => learnedKeys.has(progressKey(type, id)),
@@ -70,7 +70,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       else next.delete(key);
       setLearnedKeys(next);
 
-      persistLearned(signedIn, type, id, willLearn, Array.from(next)).catch(() => {
+      persistLearned(userId, type, id, willLearn, Array.from(next)).catch(() => {
         // Roll back on failure.
         setLearnedKeys((curr) => {
           const reverted = new Set(curr);
@@ -80,7 +80,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
         });
       });
     },
-    [learnedKeys, signedIn],
+    [learnedKeys, userId],
   );
 
   const learnedCount = useCallback(
