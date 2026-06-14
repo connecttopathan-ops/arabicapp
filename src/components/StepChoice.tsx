@@ -5,7 +5,7 @@
  * answer's audio). The user taps an option; correct/incorrect feedback shows in
  * green/red, then Continue advances. Reports whether the answer was correct.
  */
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { Pressable, View, StyleSheet } from 'react-native';
 import { ArabicText } from './ArabicText';
 import { AppText } from './AppText';
@@ -18,9 +18,13 @@ import type { LessonStep, StepOption } from '@/types/content';
 export function StepChoice({
   step,
   onNext,
+  renderHeader,
 }: {
   step: LessonStep;
   onNext: (correct: boolean) => void;
+  /** Custom content above the options (e.g. a cloze sentence). Receives the
+   *  answered state so it can reveal the answer. Replaces the default prompt. */
+  renderHeader?: (answered: boolean) => ReactNode;
 }) {
   const isListen = step.type === 'listen_choose';
   const options = step.options ?? [];
@@ -49,9 +53,13 @@ export function StepChoice({
 
   return (
     <View style={styles.wrap}>
-      <AppText variant="title" style={styles.prompt}>
-        {step.prompt ?? (isListen ? 'Which one did you hear?' : 'Choose the correct answer')}
-      </AppText>
+      {renderHeader ? (
+        renderHeader(answered)
+      ) : (
+        <AppText variant="title" style={styles.prompt}>
+          {step.prompt ?? (isListen ? 'Which one did you hear?' : 'Choose the correct answer')}
+        </AppText>
+      )}
 
       {isListen ? (
         <View style={styles.center}>

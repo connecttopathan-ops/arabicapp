@@ -5,7 +5,8 @@
  * service (via useHomeData). Nothing here knows whether the data is local or
  * from Supabase — it just renders whatever the hook returns.
  */
-import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, Pressable, ActivityIndicator, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import {
   Screen,
@@ -21,7 +22,7 @@ import { useHomeData } from '@/hooks/useHomeData';
 import { useProgress } from '@/context/ProgressContext';
 import { useStats } from '@/hooks/useStats';
 import { useAuth } from '@/context/AuthContext';
-import { colors, spacing } from '@/theme';
+import { colors, spacing, radius } from '@/theme';
 import type { UserProgress } from '@/types/content';
 
 function displayName(email: string | undefined | null): string {
@@ -74,6 +75,25 @@ export default function HomeScreen() {
         <ReviewCard />
       </View>
 
+      <View style={styles.section}>
+        <Pressable
+          onPress={() => router.push('/sentences')}
+          accessibilityRole="button"
+          style={({ pressed }) => [styles.sentenceCard, pressed && styles.sentencePressed]}
+        >
+          <View style={styles.sentenceIcon}>
+            <Ionicons name="chatbubbles-outline" size={22} color={colors.primary} />
+          </View>
+          <View style={styles.sentenceText}>
+            <AppText variant="bodyStrong">Sentence practice</AppText>
+            <AppText variant="caption" color="textMuted">
+              Fill in the blanks
+            </AppText>
+          </View>
+          <Ionicons name="chevron-forward" size={20} color={colors.textFaint} />
+        </Pressable>
+      </View>
+
       <View style={styles.statRow}>
         <StatCard icon="ellipse-outline" value={learnedCount('letter')} label="Letters" />
         <StatCard icon="text-outline" value={learnedCount('word')} label="Words" />
@@ -113,6 +133,31 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: spacing.md,
     marginTop: spacing.xl,
+  },
+  sentenceCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.lg,
+    backgroundColor: colors.card,
+    borderRadius: radius.xl,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.border,
+    padding: spacing.lg,
+  },
+  sentencePressed: {
+    opacity: 0.9,
+  },
+  sentenceIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: radius.pill,
+    backgroundColor: colors.well,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sentenceText: {
+    flex: 1,
+    gap: 2,
   },
   section: {
     marginTop: spacing['2xl'],

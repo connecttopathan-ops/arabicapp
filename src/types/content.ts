@@ -141,6 +141,17 @@ export interface ReviewItem {
   state: ReviewState | null;
 }
 
+/** A row from the `sentences` table (example + cloze exercise source). */
+export interface Sentence {
+  id: string;
+  wordId: string | null;
+  arabic: string;
+  transliteration: string | null;
+  translation: string | null;
+  /** The exact word-form (as it appears in `arabic`) to blank out. */
+  clozeTarget: string | null;
+}
+
 /** A row from the `letter_forms` table — a letter's four positional shapes. */
 export interface LetterForm {
   id: string;

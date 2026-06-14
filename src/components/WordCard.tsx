@@ -7,14 +7,15 @@
  * Collapsed, it shows just the Arabic word (the "front" of the card).
  */
 import { useState } from 'react';
-import { Pressable, View, StyleSheet } from 'react-native';
+import { Pressable, View, ActivityIndicator, StyleSheet } from 'react-native';
 import { ArabicText } from './ArabicText';
 import { AppText } from './AppText';
 import { LearnedToggle } from './LearnedToggle';
 import { SpeakerButton } from './SpeakerButton';
 import { playAudio } from '@/services/audioService';
+import { getExampleSentence } from '@/services/sentenceService';
 import { colors, radius, spacing, elevation } from '@/theme';
-import type { Word } from '@/types/content';
+import type { Word, Sentence } from '@/types/content';
 
 interface WordCardProps {
   word: Word;
@@ -24,8 +25,22 @@ interface WordCardProps {
 
 export function WordCard({ word, learned = false, onToggleLearned }: WordCardProps) {
   const [revealed, setRevealed] = useState(false);
+  const [showSentence, setShowSentence] = useState(false);
+  const [sentence, setSentence] = useState<Sentence | null>(null);
+  const [sentenceLoaded, setSentenceLoaded] = useState(false);
+  const [sentenceLoading, setSentenceLoading] = useState(false);
 
   const meta = [word.category, word.root].filter(Boolean).join(' · ');
+
+  async function revealSentence() {
+    setShowSentence(true);
+    if (sentenceLoaded || sentenceLoading) return;
+    setSentenceLoading(true);
+    const s = await getExampleSentence(word.id);
+    setSentence(s);
+    setSentenceLoaded(true);
+    setSentenceLoading(false);
+  }
 
   return (
     <Pressable
@@ -73,6 +88,41 @@ export function WordCard({ word, learned = false, onToggleLearned }: WordCardPro
                 {meta}
               </AppText>
             ) : null}
+
+            {!showSentence ? (
+              <Pressable onPress={revealSentence} hitSlop={6} style={styles.sentenceLink}>
+                <AppText variant="label" color="secondary">
+                  See it in a sentence
+                </AppText>
+              </Pressable>
+            ) : sentenceLoading ? (
+              <ActivityIndicator color={colors.primary} style={styles.sentenceBox} />
+            ) : sentence ? (
+              <View style={styles.sentenceBox}>
+                <ArabicText variant="arabicBody" center>
+                  {sentence.arabic}
+                </ArabicText>
+                {sentence.transliteration ? (
+                  <AppText variant="caption" color="textMuted" style={styles.lineCenter}>
+                    {sentence.transliteration}
+                  </AppText>
+                ) : null}
+                {sentence.translation ? (
+                  <AppText variant="caption" color="textMuted" style={styles.lineCenter}>
+                    {sentence.translation}
+                  </AppText>
+                ) : null}
+                <SpeakerButton
+                  onPress={() =>
+                    playAudio({ audioUrl: null, text: sentence.arabic })
+                  }
+                />
+              </View>
+            ) : (
+              <AppText variant="caption" color="textFaint" style={styles.sentenceBox}>
+                No example sentence yet.
+              </AppText>
+            )}
           </View>
         ) : (
           <AppText variant="caption" color="textFaint" style={styles.hint}>
@@ -123,6 +173,15 @@ const styles = StyleSheet.create({
   word: {
     fontSize: 56,
     lineHeight: 96,
+  },
+  sentenceLink: {
+    marginTop: spacing.sm,
+    paddingVertical: spacing.xs,
+  },
+  sentenceBox: {
+    marginTop: spacing.sm,
+    alignItems: 'center',
+    gap: spacing.xs,
   },
   details: {
     alignItems: 'center',

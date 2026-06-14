@@ -68,7 +68,8 @@ export async function getWords(): Promise<ContentResult<Word[]>> {
     const { data, error } = await supabase
       .from('words')
       .select('id, arabic, transliteration, english, root, category, cefr_level, frequency_rank, audio_url')
-      .order('frequency_rank', { ascending: true, nullsFirst: false });
+      .order('frequency_rank', { ascending: true, nullsFirst: false })
+      .order('arabic', { ascending: true });
     if (error) throw error;
     if (!data || data.length === 0) throw new Error('No words returned');
 
