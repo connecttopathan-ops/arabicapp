@@ -122,6 +122,25 @@ export interface LessonWithSteps {
   steps: LessonStep[];
 }
 
+/** SM-2 scheduling state for one reviewable item (per user). */
+export interface ReviewState {
+  itemType: 'letter' | 'word' | 'lesson';
+  itemId: string;
+  easeFactor: number;
+  intervalDays: number;
+  repetition: number;
+  /** ISO timestamp of when this item is next due. */
+  nextReviewAt: string;
+}
+
+/** A due item presented in a review session (content + its schedule state). */
+export interface ReviewItem {
+  itemType: 'letter' | 'word';
+  itemId: string;
+  content: Letter | Word;
+  state: ReviewState | null;
+}
+
 /** A row from the `letter_forms` table — a letter's four positional shapes. */
 export interface LetterForm {
   id: string;

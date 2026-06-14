@@ -49,6 +49,7 @@ function RootNavigator() {
       <Stack.Screen name="(auth)" />
       <Stack.Screen name="(tabs)" />
       <Stack.Screen name="play/[id]" options={{ animation: 'slide_from_bottom' }} />
+      <Stack.Screen name="review" options={{ animation: 'slide_from_bottom' }} />
     </Stack>
   );
 }

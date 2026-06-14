@@ -22,3 +22,4 @@ export { StepIntro } from './StepIntro';
 export { StepTrace } from './StepTrace';
 export { StepChoice } from './StepChoice';
 export { LessonComplete } from './LessonComplete';
+export { ReviewCard } from './ReviewCard';
