@@ -2,35 +2,60 @@
  * Root layout — runs once, wraps the whole app.
  *
  * Responsibilities:
- *  1. Load the custom fonts before anything renders (keeps the splash up so
- *     there's no flash of system fonts).
- *  2. Provide safe-area insets to every screen.
- *  3. Configure the navigation Stack. The only route here is the (tabs)
- *     group, which renders the bottom tab bar.
+ *  1. Load custom fonts (splash stays up until they're ready).
+ *  2. Provide auth state to every screen via <AuthProvider>.
+ *  3. Gate navigation: signed-out users see the (auth) flow; everyone else
+ *     sees the (tabs) app. The splash is held until we know which.
  */
 import { useEffect } from 'react';
-import { Stack } from 'expo-router';
+import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { AuthProvider, useAuth } from '@/context/AuthContext';
+import { ProgressProvider } from '@/context/ProgressContext';
 import { colors, fontAssets } from '@/theme';
 
-// Keep the splash screen visible until fonts are ready.
 SplashScreen.preventAutoHideAsync();
+
+function RootNavigator() {
+  const { isAuthed, initializing } = useAuth();
+  const segments = useSegments();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (initializing) return;
+
+    // Hide the splash now that fonts AND the auth check are both done.
+    SplashScreen.hideAsync();
+
+    const inAuthGroup = segments[0] === '(auth)';
+    if (!isAuthed && !inAuthGroup) {
+      router.replace('/(auth)/sign-in');
+    } else if (isAuthed && inAuthGroup) {
+      router.replace('/(tabs)');
+    }
+  }, [isAuthed, initializing, segments, router]);
+
+  return (
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        contentStyle: { backgroundColor: colors.background },
+      }}
+    >
+      <Stack.Screen name="(auth)" />
+      <Stack.Screen name="(tabs)" />
+    </Stack>
+  );
+}
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts(fontAssets);
 
-  useEffect(() => {
-    if (fontsLoaded || fontError) {
-      SplashScreen.hideAsync();
-    }
-  }, [fontsLoaded, fontError]);
-
-  // Render nothing until fonts resolve (success or error) so the UI never
-  // appears with the wrong typography.
+  // Wait for fonts before rendering anything (splash covers this).
   if (!fontsLoaded && !fontError) {
     return null;
   }
@@ -38,15 +63,12 @@ export default function RootLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
-        <StatusBar style="light" />
-        <Stack
-          screenOptions={{
-            headerShown: false,
-            contentStyle: { backgroundColor: colors.background },
-          }}
-        >
-          <Stack.Screen name="(tabs)" />
-        </Stack>
+        <AuthProvider>
+          <ProgressProvider>
+            <StatusBar style="light" />
+            <RootNavigator />
+          </ProgressProvider>
+        </AuthProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );

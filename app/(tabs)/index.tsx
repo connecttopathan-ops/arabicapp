@@ -17,10 +17,12 @@ import {
   AppText,
 } from '@/components';
 import { useHomeData } from '@/hooks/useHomeData';
+import { useProgress } from '@/context/ProgressContext';
 import { colors, spacing } from '@/theme';
 
 export default function HomeScreen() {
   const { data, loading, error } = useHomeData();
+  const { learnedCount } = useProgress();
   const router = useRouter();
 
   if (loading) {
@@ -48,8 +50,8 @@ export default function HomeScreen() {
       <HeroCard progress={progress} />
 
       <View style={styles.statRow}>
-        <StatCard icon="ellipse-outline" value={stats.lettersLearned} label="Letters" />
-        <StatCard icon="text-outline" value={stats.wordsLearned} label="Words" />
+        <StatCard icon="ellipse-outline" value={learnedCount('letter')} label="Letters" />
+        <StatCard icon="text-outline" value={learnedCount('word')} label="Words" />
         <StatCard icon="checkmark-done-outline" value={stats.lessonsCompleted} label="Lessons" />
       </View>
 
