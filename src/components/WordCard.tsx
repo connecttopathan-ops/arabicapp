@@ -1,0 +1,132 @@
+/**
+ * WordCard — a full-page vocabulary flashcard (one per screen in the pager).
+ *
+ *  - Tap the card body  -> reveal the transliteration and English meaning.
+ *  - Tap the corner ring -> mark/unmark as learned.
+ *
+ * Collapsed, it shows just the Arabic word (the "front" of the card).
+ */
+import { useState } from 'react';
+import { Pressable, View, StyleSheet } from 'react-native';
+import { ArabicText } from './ArabicText';
+import { AppText } from './AppText';
+import { LearnedToggle } from './LearnedToggle';
+import { colors, radius, spacing, elevation } from '@/theme';
+import type { Word } from '@/types/content';
+
+interface WordCardProps {
+  word: Word;
+  learned?: boolean;
+  onToggleLearned?: () => void;
+}
+
+export function WordCard({ word, learned = false, onToggleLearned }: WordCardProps) {
+  const [revealed, setRevealed] = useState(false);
+
+  const meta = [word.category, word.root].filter(Boolean).join(' · ');
+
+  return (
+    <Pressable
+      onPress={() => setRevealed((r) => !r)}
+      accessibilityRole="button"
+      accessibilityLabel={`Word. Tap to ${revealed ? 'hide' : 'reveal'} meaning`}
+      style={({ pressed }) => [
+        styles.card,
+        elevation.card,
+        learned && styles.cardLearned,
+        pressed && styles.pressed,
+      ]}
+    >
+      <LearnedToggle learned={learned} onPress={onToggleLearned} style={styles.corner} />
+
+      {word.cefrLevel ? (
+        <View style={styles.chip}>
+          <AppText variant="overline" color="secondary">
+            {word.cefrLevel}
+          </AppText>
+        </View>
+      ) : null}
+
+      <View style={styles.center}>
+        <ArabicText center style={styles.word}>
+          {word.arabic}
+        </ArabicText>
+
+        {revealed ? (
+          <View style={styles.details}>
+            <AppText variant="title" style={styles.lineCenter}>
+              {word.english ?? '—'}
+            </AppText>
+            {word.transliteration ? (
+              <AppText variant="bodyStrong" color="primary" style={styles.lineCenter}>
+                {word.transliteration}
+              </AppText>
+            ) : null}
+            {meta ? (
+              <AppText variant="caption" color="textMuted" style={styles.lineCenter}>
+                {meta}
+              </AppText>
+            ) : null}
+          </View>
+        ) : (
+          <AppText variant="caption" color="textFaint" style={styles.hint}>
+            Tap to reveal meaning
+          </AppText>
+        )}
+      </View>
+    </Pressable>
+  );
+}
+
+const styles = StyleSheet.create({
+  card: {
+    flex: 1,
+    marginHorizontal: spacing.xl,
+    marginVertical: spacing.md,
+    backgroundColor: colors.card,
+    borderRadius: radius['2xl'],
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: spacing['2xl'],
+    justifyContent: 'center',
+  },
+  cardLearned: {
+    borderColor: colors.primary,
+  },
+  pressed: {
+    opacity: 0.96,
+  },
+  corner: {
+    position: 'absolute',
+    top: spacing.lg,
+    right: spacing.lg,
+  },
+  chip: {
+    position: 'absolute',
+    top: spacing.lg,
+    left: spacing.lg,
+    backgroundColor: colors.well,
+    borderRadius: radius.sm,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 2,
+  },
+  center: {
+    alignItems: 'center',
+    gap: spacing.lg,
+  },
+  word: {
+    fontSize: 56,
+    lineHeight: 96,
+  },
+  details: {
+    alignItems: 'center',
+    gap: spacing.sm,
+    paddingHorizontal: spacing.lg,
+  },
+  lineCenter: {
+    textAlign: 'center',
+  },
+  hint: {
+    textAlign: 'center',
+  },
+});

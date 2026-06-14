@@ -12,6 +12,6 @@ export { SectionHeader } from './SectionHeader';
 export { Placeholder } from './Placeholder';
 export { Button } from './Button';
 export { TextField } from './TextField';
-export { LetterTile } from './LetterTile';
-export { WordRow } from './WordRow';
+export { LetterCard } from './LetterCard';
+export { WordCard } from './WordCard';
 export { LearnedToggle } from './LearnedToggle';
