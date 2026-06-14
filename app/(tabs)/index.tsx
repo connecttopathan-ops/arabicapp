@@ -19,11 +19,22 @@ import {
 } from '@/components';
 import { useHomeData } from '@/hooks/useHomeData';
 import { useProgress } from '@/context/ProgressContext';
+import { useStats } from '@/hooks/useStats';
+import { useAuth } from '@/context/AuthContext';
 import { colors, spacing } from '@/theme';
+import type { UserProgress } from '@/types/content';
+
+function displayName(email: string | undefined | null): string {
+  if (!email) return 'there';
+  const local = email.split('@')[0];
+  return local.charAt(0).toUpperCase() + local.slice(1);
+}
 
 export default function HomeScreen() {
   const { data, loading, error } = useHomeData();
   const { learnedCount } = useProgress();
+  const stats = useStats();
+  const { session, isGuest } = useAuth();
   const router = useRouter();
 
   if (loading) {
@@ -44,11 +55,20 @@ export default function HomeScreen() {
     );
   }
 
-  const { progress, stats, continueLesson, topics } = data;
+  const { continueLesson, topics } = data;
+
+  const heroProgress: UserProgress = {
+    name: isGuest ? 'Guest' : displayName(session?.user?.email),
+    streakDays: stats.streak,
+    level: stats.level,
+    levelTitle: stats.levelTitle,
+    xp: stats.xpIntoLevel,
+    xpToNext: stats.xpForLevel,
+  };
 
   return (
     <Screen>
-      <HeroCard progress={progress} />
+      <HeroCard progress={heroProgress} />
 
       <View style={styles.section}>
         <ReviewCard />
@@ -57,7 +77,7 @@ export default function HomeScreen() {
       <View style={styles.statRow}>
         <StatCard icon="ellipse-outline" value={learnedCount('letter')} label="Letters" />
         <StatCard icon="text-outline" value={learnedCount('word')} label="Words" />
-        <StatCard icon="checkmark-done-outline" value={stats.lessonsCompleted} label="Lessons" />
+        <StatCard icon="checkmark-done-outline" value={learnedCount('lesson')} label="Lessons" />
       </View>
 
       <View style={styles.section}>
