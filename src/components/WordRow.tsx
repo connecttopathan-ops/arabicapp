@@ -1,61 +1,69 @@
 /**
- * WordRow — one vocabulary entry: Arabic on the right, transliteration and
- * English gloss on the left, with a small CEFR-level chip. Tappable to toggle
- * "learned" (gold ring + check icon).
+ * WordRow — a vocabulary flashcard row.
+ *
+ * Two separate interactions:
+ *  - Tap the row body    -> reveal the transliteration and English meaning.
+ *  - Tap the corner ring -> mark/unmark as learned (gold ring + check).
+ *
+ * Collapsed, it shows just the Arabic (the "front" of the card).
  */
+import { useState } from 'react';
 import { Pressable, View, StyleSheet } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { ArabicText } from './ArabicText';
 import { AppText } from './AppText';
+import { LearnedToggle } from './LearnedToggle';
 import { colors, radius, spacing } from '@/theme';
 import type { Word } from '@/types/content';
 
 interface WordRowProps {
   word: Word;
   learned?: boolean;
-  onPress?: () => void;
+  onToggleLearned?: () => void;
 }
 
-export function WordRow({ word, learned = false, onPress }: WordRowProps) {
+export function WordRow({ word, learned = false, onToggleLearned }: WordRowProps) {
+  const [revealed, setRevealed] = useState(false);
+
   return (
     <Pressable
-      onPress={onPress}
+      onPress={() => setRevealed((r) => !r)}
       accessibilityRole="button"
-      accessibilityState={{ selected: learned }}
-      accessibilityLabel={`${word.english ?? word.transliteration ?? 'word'}${learned ? ', learned' : ''}`}
+      accessibilityLabel={`Word. Tap to ${revealed ? 'hide' : 'reveal'} meaning`}
       style={({ pressed }) => [
         styles.row,
         learned && styles.rowLearned,
         pressed && styles.pressed,
       ]}
     >
-      <View style={styles.check}>
-        <Ionicons
-          name={learned ? 'checkmark-circle' : 'ellipse-outline'}
-          size={22}
-          color={learned ? colors.primary : colors.textFaint}
-        />
-      </View>
+      <LearnedToggle learned={learned} onPress={onToggleLearned} />
 
       <View style={styles.left}>
-        <View style={styles.glossRow}>
-          <AppText variant="bodyStrong" numberOfLines={1}>
-            {word.english ?? '—'}
-          </AppText>
-          {word.cefrLevel ? (
-            <View style={styles.chip}>
-              <AppText variant="overline" color="secondary">
-                {word.cefrLevel}
+        {revealed ? (
+          <>
+            <View style={styles.glossRow}>
+              <AppText variant="bodyStrong" numberOfLines={1}>
+                {word.english ?? '—'}
               </AppText>
+              {word.cefrLevel ? (
+                <View style={styles.chip}>
+                  <AppText variant="overline" color="secondary">
+                    {word.cefrLevel}
+                  </AppText>
+                </View>
+              ) : null}
             </View>
-          ) : null}
-        </View>
-        {word.transliteration ? (
-          <AppText variant="caption" color="textMuted" numberOfLines={1}>
-            {word.transliteration}
-            {word.category ? ` · ${word.category}` : ''}
+            {word.transliteration ? (
+              <AppText variant="caption" color="textMuted" numberOfLines={1}>
+                {word.transliteration}
+                {word.category ? ` · ${word.category}` : ''}
+              </AppText>
+            ) : null}
+          </>
+        ) : (
+          <AppText variant="caption" color="textFaint">
+            Tap to reveal
           </AppText>
-        ) : null}
+        )}
       </View>
 
       <ArabicText variant="arabicBody" style={styles.arabic} numberOfLines={1}>
@@ -82,9 +90,6 @@ const styles = StyleSheet.create({
   },
   pressed: {
     opacity: 0.85,
-  },
-  check: {
-    width: 22,
   },
   left: {
     flex: 1,

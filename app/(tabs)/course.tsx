@@ -62,7 +62,7 @@ export default function CourseScreen() {
               <LetterTile
                 letter={letter}
                 learned={isLearned('letter', letter.id)}
-                onPress={() => toggle('letter', letter.id)}
+                onToggleLearned={() => toggle('letter', letter.id)}
               />
             </View>
           ))}
@@ -77,7 +77,7 @@ export default function CourseScreen() {
               key={word.id}
               word={word}
               learned={isLearned('word', word.id)}
-              onPress={() => toggle('word', word.id)}
+              onToggleLearned={() => toggle('word', word.id)}
             />
           ))}
         </View>

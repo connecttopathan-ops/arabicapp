@@ -14,3 +14,4 @@ export { Button } from './Button';
 export { TextField } from './TextField';
 export { LetterTile } from './LetterTile';
 export { WordRow } from './WordRow';
+export { LearnedToggle } from './LearnedToggle';

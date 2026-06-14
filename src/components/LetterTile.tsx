@@ -1,49 +1,60 @@
 /**
- * LetterTile — a single alphabet cell: the isolated glyph with its name and
- * transliteration. Tappable to toggle "learned", shown with a gold ring and a
- * checkmark badge.
+ * LetterTile — an alphabet flashcard.
+ *
+ * Two separate interactions:
+ *  - Tap the card body  -> reveal the letter's name, sound, and pronunciation.
+ *  - Tap the corner ring -> mark/unmark as learned (gold ring + check).
  */
-import { Pressable, View, StyleSheet } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { useState } from 'react';
+import { Pressable, StyleSheet } from 'react-native';
 import { ArabicText } from './ArabicText';
 import { AppText } from './AppText';
+import { LearnedToggle } from './LearnedToggle';
 import { colors, radius, spacing } from '@/theme';
 import type { Letter } from '@/types/content';
 
 interface LetterTileProps {
   letter: Letter;
   learned?: boolean;
-  onPress?: () => void;
+  onToggleLearned?: () => void;
 }
 
-export function LetterTile({ letter, learned = false, onPress }: LetterTileProps) {
+export function LetterTile({ letter, learned = false, onToggleLearned }: LetterTileProps) {
+  const [revealed, setRevealed] = useState(false);
+
   return (
     <Pressable
-      onPress={onPress}
+      onPress={() => setRevealed((r) => !r)}
       accessibilityRole="button"
-      accessibilityState={{ selected: learned }}
-      accessibilityLabel={`${letter.name}${learned ? ', learned' : ''}`}
+      accessibilityLabel={`${letter.name}. Tap to ${revealed ? 'hide' : 'reveal'} details`}
       style={({ pressed }) => [
         styles.tile,
         learned && styles.tileLearned,
         pressed && styles.pressed,
       ]}
     >
-      {learned ? (
-        <View style={styles.badge}>
-          <Ionicons name="checkmark" size={12} color={colors.textOnAccent} />
-        </View>
-      ) : null}
+      <LearnedToggle learned={learned} onPress={onToggleLearned} style={styles.corner} />
+
       <ArabicText variant="arabicLarge" center style={styles.glyph}>
         {letter.letter}
       </ArabicText>
-      <AppText variant="label" numberOfLines={1}>
-        {letter.name}
-      </AppText>
-      {letter.transliteration ? (
-        <AppText variant="caption" color="textMuted" numberOfLines={1}>
-          {letter.transliteration}
-        </AppText>
+
+      {revealed ? (
+        <>
+          <AppText variant="label" style={styles.center} numberOfLines={1}>
+            {letter.name}
+          </AppText>
+          {letter.transliteration ? (
+            <AppText variant="caption" color="primary" style={styles.center}>
+              {letter.transliteration}
+            </AppText>
+          ) : null}
+          {letter.pronunciation ? (
+            <AppText variant="caption" color="textMuted" style={styles.center}>
+              {letter.pronunciation}
+            </AppText>
+          ) : null}
+        </>
       ) : null}
     </Pressable>
   );
@@ -70,15 +81,12 @@ const styles = StyleSheet.create({
   glyph: {
     marginBottom: spacing.xs,
   },
-  badge: {
+  center: {
+    textAlign: 'center',
+  },
+  corner: {
     position: 'absolute',
     top: spacing.xs,
     right: spacing.xs,
-    width: 18,
-    height: 18,
-    borderRadius: radius.pill,
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
 });
