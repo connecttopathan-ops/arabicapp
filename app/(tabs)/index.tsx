@@ -14,6 +14,7 @@ import {
   ContinueBanner,
   TopicTile,
   SectionHeader,
+  ReviewCard,
   AppText,
 } from '@/components';
 import { useHomeData } from '@/hooks/useHomeData';
@@ -48,6 +49,10 @@ export default function HomeScreen() {
   return (
     <Screen>
       <HeroCard progress={progress} />
+
+      <View style={styles.section}>
+        <ReviewCard />
+      </View>
 
       <View style={styles.statRow}>
         <StatCard icon="ellipse-outline" value={learnedCount('letter')} label="Letters" />
