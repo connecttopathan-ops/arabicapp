@@ -77,6 +77,8 @@ export interface Letter {
   transliteration: string | null;
   forms: LetterForms | null;
   pronunciation: string | null;
+  /** Optional recorded audio (falls back to device TTS when absent). */
+  audioUrl?: string | null;
 }
 
 /** The kinds of item a user can mark as learned (matches user_progress). */
@@ -93,4 +95,6 @@ export interface Word {
   category: string | null;
   cefrLevel: string | null;
   frequencyRank: number | null;
+  /** Optional recorded audio (falls back to device TTS when absent). */
+  audioUrl?: string | null;
 }

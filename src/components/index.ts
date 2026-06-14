@@ -15,3 +15,4 @@ export { TextField } from './TextField';
 export { LetterCard } from './LetterCard';
 export { WordCard } from './WordCard';
 export { LearnedToggle } from './LearnedToggle';
+export { SpeakerButton } from './SpeakerButton';

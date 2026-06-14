@@ -32,7 +32,7 @@ export async function getLetters(): Promise<ContentResult<Letter[]>> {
   try {
     const { data, error } = await supabase
       .from('letters')
-      .select('id, position, name, letter, transliteration, forms, pronunciation')
+      .select('id, position, name, letter, transliteration, forms, pronunciation, audio_url')
       .order('position', { ascending: true });
     if (error) throw error;
     if (!data || data.length === 0) throw new Error('No letters returned');
@@ -45,6 +45,7 @@ export async function getLetters(): Promise<ContentResult<Letter[]>> {
       transliteration: row.transliteration,
       forms: row.forms,
       pronunciation: row.pronunciation,
+      audioUrl: row.audio_url ?? null,
     }));
 
     await cacheSet('letters', letters);
@@ -60,7 +61,7 @@ export async function getWords(): Promise<ContentResult<Word[]>> {
   try {
     const { data, error } = await supabase
       .from('words')
-      .select('id, arabic, transliteration, english, root, category, cefr_level, frequency_rank')
+      .select('id, arabic, transliteration, english, root, category, cefr_level, frequency_rank, audio_url')
       .order('frequency_rank', { ascending: true, nullsFirst: false });
     if (error) throw error;
     if (!data || data.length === 0) throw new Error('No words returned');
@@ -74,6 +75,7 @@ export async function getWords(): Promise<ContentResult<Word[]>> {
       category: row.category,
       cefrLevel: row.cefr_level,
       frequencyRank: row.frequency_rank,
+      audioUrl: row.audio_url ?? null,
     }));
 
     await cacheSet('words', words);

@@ -9,6 +9,8 @@ import { Pressable, View, StyleSheet } from 'react-native';
 import { ArabicText } from './ArabicText';
 import { AppText } from './AppText';
 import { LearnedToggle } from './LearnedToggle';
+import { SpeakerButton } from './SpeakerButton';
+import { playAudio } from '@/services/audioService';
 import { colors, radius, spacing, elevation } from '@/theme';
 import type { Letter } from '@/types/content';
 
@@ -39,6 +41,10 @@ export function LetterCard({ letter, learned = false, onToggleLearned }: LetterC
         <ArabicText center style={styles.glyph}>
           {letter.letter}
         </ArabicText>
+
+        <SpeakerButton
+          onPress={() => playAudio({ audioUrl: letter.audioUrl, text: letter.letter })}
+        />
 
         {revealed ? (
           <View style={styles.details}>

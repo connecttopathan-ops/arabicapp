@@ -11,6 +11,8 @@ import { Pressable, View, StyleSheet } from 'react-native';
 import { ArabicText } from './ArabicText';
 import { AppText } from './AppText';
 import { LearnedToggle } from './LearnedToggle';
+import { SpeakerButton } from './SpeakerButton';
+import { playAudio } from '@/services/audioService';
 import { colors, radius, spacing, elevation } from '@/theme';
 import type { Word } from '@/types/content';
 
@@ -51,6 +53,10 @@ export function WordCard({ word, learned = false, onToggleLearned }: WordCardPro
         <ArabicText center style={styles.word}>
           {word.arabic}
         </ArabicText>
+
+        <SpeakerButton
+          onPress={() => playAudio({ audioUrl: word.audioUrl, text: word.arabic })}
+        />
 
         {revealed ? (
           <View style={styles.details}>
