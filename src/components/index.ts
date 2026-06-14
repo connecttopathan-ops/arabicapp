@@ -16,3 +16,5 @@ export { LetterCard } from './LetterCard';
 export { WordCard } from './WordCard';
 export { LearnedToggle } from './LearnedToggle';
 export { SpeakerButton } from './SpeakerButton';
+export { LetterFormRow } from './LetterFormRow';
+export { WordBreakdownRow } from './WordBreakdownRow';

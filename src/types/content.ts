@@ -84,6 +84,39 @@ export interface Letter {
 /** The kinds of item a user can mark as learned (matches user_progress). */
 export type ProgressItemType = 'letter' | 'word' | 'sentence';
 
+/** A row from the `letter_forms` table — a letter's four positional shapes. */
+export interface LetterForm {
+  id: string;
+  seq: number;
+  name: string;
+  sound: string | null;
+  isolated: string;
+  initial: string;
+  medial: string;
+  final: string;
+  note: string | null;
+  /** True for the six letters that never join to the following letter. */
+  nonConnector: boolean;
+}
+
+/** One glyph-piece of a word: glyph, letter name, position label. */
+export interface WordPiece {
+  g: string;
+  n: string;
+  p: string;
+}
+
+/** A row from the `word_breakdowns` table. */
+export interface WordBreakdown {
+  id: string;
+  seq: number;
+  wordAr: string;
+  translit: string | null;
+  glossEn: string | null;
+  /** Pieces in right-to-left reading order. */
+  pieces: WordPiece[];
+}
+
 /** A row from the `words` table. */
 export interface Word {
   id: string;

@@ -6,8 +6,14 @@
  * from the network) — handy for showing an "offline" hint.
  */
 import { useEffect, useState } from 'react';
-import { getLetters, getWords, type ContentSource } from '@/services/contentService';
-import type { Letter, Word } from '@/types/content';
+import {
+  getLetters,
+  getWords,
+  getLetterForms,
+  getWordBreakdowns,
+  type ContentSource,
+} from '@/services/contentService';
+import type { Letter, Word, LetterForm, WordBreakdown } from '@/types/content';
 
 interface ContentState<T> {
   data: T;
@@ -54,4 +60,12 @@ export function useLetters() {
 
 export function useWords() {
   return useContent<Word[]>(getWords, []);
+}
+
+export function useLetterForms() {
+  return useContent<LetterForm[]>(getLetterForms, []);
+}
+
+export function useWordBreakdowns() {
+  return useContent<WordBreakdown[]>(getWordBreakdowns, []);
 }
