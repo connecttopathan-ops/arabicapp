@@ -18,3 +18,7 @@ export { LearnedToggle } from './LearnedToggle';
 export { SpeakerButton } from './SpeakerButton';
 export { LetterFormRow } from './LetterFormRow';
 export { WordBreakdownRow } from './WordBreakdownRow';
+export { StepIntro } from './StepIntro';
+export { StepTrace } from './StepTrace';
+export { StepChoice } from './StepChoice';
+export { LessonComplete } from './LessonComplete';

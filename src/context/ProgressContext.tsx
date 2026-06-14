@@ -23,6 +23,8 @@ interface ProgressContextValue {
   loading: boolean;
   isLearned: (type: ProgressItemType, id: string) => boolean;
   toggle: (type: ProgressItemType, id: string) => void;
+  /** Idempotently mark an item learned/completed (no-op if already set). */
+  markLearned: (type: ProgressItemType, id: string) => void;
   learnedCount: (type: ProgressItemType) => number;
 }
 
@@ -83,6 +85,26 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     [learnedKeys, userId],
   );
 
+  const markLearned = useCallback(
+    (type: ProgressItemType, id: string) => {
+      const key = progressKey(type, id);
+      if (learnedKeys.has(key)) return; // already done
+
+      const next = new Set(learnedKeys);
+      next.add(key);
+      setLearnedKeys(next);
+
+      persistLearned(userId, type, id, true, Array.from(next)).catch(() => {
+        setLearnedKeys((curr) => {
+          const reverted = new Set(curr);
+          reverted.delete(key);
+          return reverted;
+        });
+      });
+    },
+    [learnedKeys, userId],
+  );
+
   const learnedCount = useCallback(
     (type: ProgressItemType) => {
       let n = 0;
@@ -94,8 +116,8 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
   );
 
   const value = useMemo<ProgressContextValue>(
-    () => ({ loading, isLearned, toggle, learnedCount }),
-    [loading, isLearned, toggle, learnedCount],
+    () => ({ loading, isLearned, toggle, markLearned, learnedCount }),
+    [loading, isLearned, toggle, markLearned, learnedCount],
   );
 
   return <ProgressContext.Provider value={value}>{children}</ProgressContext.Provider>;
