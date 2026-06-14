@@ -20,6 +20,8 @@ import {
 } from '@/components';
 import { useLesson } from '@/hooks/useContent';
 import { useProgress } from '@/context/ProgressContext';
+import { useAuth } from '@/context/AuthContext';
+import { recordActivity } from '@/services/statsService';
 import { colors, spacing, layout } from '@/theme';
 
 export default function LessonPlayer() {
@@ -27,7 +29,9 @@ export default function LessonPlayer() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { data, loading } = useLesson(id);
-  const { markLearned } = useProgress();
+  const { markLearned, isLearned } = useProgress();
+  const { session } = useAuth();
+  const userId = session?.user?.id ?? null;
 
   const [index, setIndex] = useState(0);
   const [score, setScore] = useState(0);
@@ -42,7 +46,12 @@ export default function LessonPlayer() {
 
   // Record completion once when the user finishes.
   useEffect(() => {
-    if (completed && data) markLearned('lesson', data.lesson.id);
+    if (!completed || !data) return;
+    // Award XP only the first time this lesson is completed; activity always
+    // counts toward the streak.
+    const firstTime = !isLearned('lesson', data.lesson.id);
+    markLearned('lesson', data.lesson.id);
+    recordActivity(userId, firstTime ? data.lesson.xp : 0).catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [completed]);
 

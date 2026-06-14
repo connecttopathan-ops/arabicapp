@@ -12,6 +12,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { AppText, ProgressBar, StepChoice, Button } from '@/components';
 import { useReview } from '@/hooks/useReview';
 import { buildReviewStep } from '@/services/reviewService';
+import { recordActivity, REVIEW_XP_PER_CORRECT } from '@/services/statsService';
+import { useAuth } from '@/context/AuthContext';
 import { colors, spacing, layout, radius } from '@/theme';
 import type { ReviewItem } from '@/types/content';
 
@@ -19,6 +21,8 @@ export default function ReviewSession() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { loading, due, submit, allLetters, allWords } = useReview();
+  const { session } = useAuth();
+  const userId = session?.user?.id ?? null;
 
   // Snapshot the due list once so it doesn't shrink under us as we answer.
   const [queue, setQueue] = useState<ReviewItem[] | null>(null);
@@ -30,6 +34,13 @@ export default function ReviewSession() {
     if (queue === null && !loading) setQueue(due);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading]);
+
+  // Award XP + bump the streak once, when the session finishes with items.
+  const xpEarned = correctCount * REVIEW_XP_PER_CORRECT;
+  useEffect(() => {
+    if (finished && total > 0) recordActivity(userId, xpEarned).catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [finished]);
 
   const total = queue?.length ?? 0;
   const currentItem = queue && index < total ? queue[index] : null;
@@ -70,7 +81,7 @@ export default function ReviewSession() {
         <AppText variant="body" color="textMuted" style={styles.center}>
           {caughtUp
             ? 'Nothing is due right now. Learn more in the Course, then come back.'
-            : `You reviewed ${total} item${total === 1 ? '' : 's'} · ${correctCount} correct.`}
+            : `You reviewed ${total} item${total === 1 ? '' : 's'} · ${correctCount} correct · +${xpEarned} XP`}
         </AppText>
         <View style={styles.doneBtn}>
           <Button label="Done" onPress={() => router.back()} />
