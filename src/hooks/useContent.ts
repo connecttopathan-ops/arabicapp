@@ -13,7 +13,15 @@ import {
   getWordBreakdowns,
   type ContentSource,
 } from '@/services/contentService';
-import type { Letter, Word, LetterForm, WordBreakdown } from '@/types/content';
+import { getLessons, getLessonWithSteps } from '@/services/lessonService';
+import type {
+  Letter,
+  Word,
+  LetterForm,
+  WordBreakdown,
+  Lesson,
+  LessonWithSteps,
+} from '@/types/content';
 
 interface ContentState<T> {
   data: T;
@@ -68,4 +76,37 @@ export function useLetterForms() {
 
 export function useWordBreakdowns() {
   return useContent<WordBreakdown[]>(getWordBreakdowns, []);
+}
+
+export function useLessons() {
+  return useContent<Lesson[]>(getLessons, []);
+}
+
+/** Loads a single lesson (with steps); reloads if the id changes. */
+export function useLesson(id: string) {
+  const [state, setState] = useState<ContentState<LessonWithSteps | null>>({
+    data: null,
+    loading: true,
+    error: null,
+    offline: false,
+  });
+
+  useEffect(() => {
+    let active = true;
+    setState((s) => ({ ...s, loading: true }));
+    getLessonWithSteps(id)
+      .then(({ data, source }) => {
+        if (active) {
+          setState({ data, loading: false, error: null, offline: source !== 'network' });
+        }
+      })
+      .catch((error: Error) => {
+        if (active) setState((s) => ({ ...s, loading: false, error }));
+      });
+    return () => {
+      active = false;
+    };
+  }, [id]);
+
+  return state;
 }

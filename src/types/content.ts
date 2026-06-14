@@ -82,7 +82,45 @@ export interface Letter {
 }
 
 /** The kinds of item a user can mark as learned (matches user_progress). */
-export type ProgressItemType = 'letter' | 'word' | 'sentence';
+export type ProgressItemType = 'letter' | 'word' | 'sentence' | 'lesson';
+
+/** A guided lesson (a sequence of steps). */
+export interface Lesson {
+  id: string;
+  slug: string | null;
+  title: string;
+  subtitle: string | null;
+  seq: number | null;
+  xp: number;
+}
+
+export type LessonStepType = 'intro' | 'trace' | 'multiple_choice' | 'listen_choose';
+
+/** A choice in a multiple-choice / listen-and-choose step. */
+export interface StepOption {
+  id: string;
+  arabic?: string | null;
+  label?: string | null;
+  correct?: boolean;
+}
+
+/** A single step within a lesson, with its referenced content resolved. */
+export interface LessonStep {
+  id: string;
+  seq: number;
+  type: LessonStepType;
+  prompt: string | null;
+  options: StepOption[] | null;
+  itemType: 'letter' | 'word' | null;
+  itemId: string | null;
+  /** The resolved letter/word this step is about (for display + audio). */
+  item: Letter | Word | null;
+}
+
+export interface LessonWithSteps {
+  lesson: Lesson;
+  steps: LessonStep[];
+}
 
 /** A row from the `letter_forms` table — a letter's four positional shapes. */
 export interface LetterForm {
