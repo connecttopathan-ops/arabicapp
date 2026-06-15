@@ -34,6 +34,7 @@ import {
   useWordBreakdowns,
 } from '@/hooks/useContent';
 import { useProgress } from '@/context/ProgressContext';
+import { useSettings } from '@/context/SettingsContext';
 import { colors, spacing, radius, layout } from '@/theme';
 import type { Letter, Word } from '@/types/content';
 
@@ -54,8 +55,10 @@ export default function CourseScreen() {
   const forms = useLetterForms();
   const breakdowns = useWordBreakdowns();
   const { isLearned, toggle } = useProgress();
+  const { placement } = useSettings();
 
-  const [tab, setTab] = useState<Tab>('alphabet');
+  // Start readers on Vocabulary, beginners on the Alphabet (from onboarding).
+  const [tab, setTab] = useState<Tab>(placement === 'can_read' ? 'vocab' : 'alphabet');
   const [index, setIndex] = useState(0);
 
   const active =

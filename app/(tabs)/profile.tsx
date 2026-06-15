@@ -7,10 +7,12 @@ import { View, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Screen, AppText, Button, Card } from '@/components';
 import { useAuth } from '@/context/AuthContext';
+import { useSettings } from '@/context/SettingsContext';
 import { colors, spacing, radius } from '@/theme';
 
 export default function ProfileScreen() {
   const { user, isGuest, signOut } = useAuth();
+  const { dailyGoalMinutes } = useSettings();
 
   const displayName = isGuest ? 'Guest' : user?.email ?? 'Signed in';
   const subtitle = isGuest
@@ -34,6 +36,16 @@ export default function ProfileScreen() {
           {subtitle}
         </AppText>
       </View>
+
+      <Card style={styles.goalCard}>
+        <View style={styles.goalRow}>
+          <Ionicons name="flag-outline" size={20} color={colors.secondary} />
+          <AppText variant="bodyStrong">Daily goal</AppText>
+        </View>
+        <AppText variant="body" color="textMuted">
+          {dailyGoalMinutes} minutes a day
+        </AppText>
+      </Card>
 
       {isGuest ? (
         <Card style={styles.guestCard}>
@@ -73,6 +85,15 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     textAlign: 'center',
+  },
+  goalCard: {
+    gap: spacing.xs,
+    marginBottom: spacing.lg,
+  },
+  goalRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
   },
   guestCard: {
     gap: spacing.md,

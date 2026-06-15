@@ -16,28 +16,42 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { ProgressProvider } from '@/context/ProgressContext';
+import { SettingsProvider, useSettings } from '@/context/SettingsContext';
 import { colors, fontAssets } from '@/theme';
 
 SplashScreen.preventAutoHideAsync();
 
 function RootNavigator() {
   const { isAuthed, initializing } = useAuth();
+  const { onboarded, loading: settingsLoading } = useSettings();
   const segments = useSegments();
   const router = useRouter();
 
   useEffect(() => {
-    if (initializing) return;
+    if (initializing || settingsLoading) return;
 
-    // Hide the splash now that fonts AND the auth check are both done.
+    // Hide the splash now that fonts, auth, and settings are all ready.
     SplashScreen.hideAsync();
 
-    const inAuthGroup = segments[0] === '(auth)';
+    const first = segments[0];
+
+    // First-run onboarding takes precedence over everything.
+    if (!onboarded) {
+      if (first !== 'onboarding') router.replace('/onboarding');
+      return;
+    }
+    if (first === 'onboarding') {
+      router.replace(isAuthed ? '/(tabs)' : '/(auth)/sign-in');
+      return;
+    }
+
+    const inAuthGroup = first === '(auth)';
     if (!isAuthed && !inAuthGroup) {
       router.replace('/(auth)/sign-in');
     } else if (isAuthed && inAuthGroup) {
       router.replace('/(tabs)');
     }
-  }, [isAuthed, initializing, segments, router]);
+  }, [isAuthed, initializing, onboarded, settingsLoading, segments, router]);
 
   return (
     <Stack
@@ -46,6 +60,7 @@ function RootNavigator() {
         contentStyle: { backgroundColor: colors.background },
       }}
     >
+      <Stack.Screen name="onboarding" />
       <Stack.Screen name="(auth)" />
       <Stack.Screen name="(tabs)" />
       <Stack.Screen name="play/[id]" options={{ animation: 'slide_from_bottom' }} />
@@ -67,10 +82,12 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
         <AuthProvider>
-          <ProgressProvider>
-            <StatusBar style="light" />
-            <RootNavigator />
-          </ProgressProvider>
+          <SettingsProvider>
+            <ProgressProvider>
+              <StatusBar style="light" />
+              <RootNavigator />
+            </ProgressProvider>
+          </SettingsProvider>
         </AuthProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
