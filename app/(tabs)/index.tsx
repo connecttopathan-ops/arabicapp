@@ -16,6 +16,7 @@ import {
   TopicTile,
   SectionHeader,
   ReviewCard,
+  NotificationPrompt,
   AppText,
 } from '@/components';
 import { useHomeData } from '@/hooks/useHomeData';
@@ -69,6 +70,7 @@ export default function HomeScreen() {
 
   return (
     <Screen>
+      <NotificationPrompt />
       <HeroCard progress={heroProgress} />
 
       <View style={styles.section}>

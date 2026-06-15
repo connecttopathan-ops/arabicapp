@@ -17,6 +17,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { ProgressProvider } from '@/context/ProgressContext';
 import { SettingsProvider, useSettings } from '@/context/SettingsContext';
+import { NotificationsManager } from '@/components';
 import { colors, fontAssets } from '@/theme';
 
 SplashScreen.preventAutoHideAsync();
@@ -54,19 +55,22 @@ function RootNavigator() {
   }, [isAuthed, initializing, onboarded, settingsLoading, segments, router]);
 
   return (
-    <Stack
-      screenOptions={{
-        headerShown: false,
-        contentStyle: { backgroundColor: colors.background },
-      }}
-    >
-      <Stack.Screen name="onboarding" />
-      <Stack.Screen name="(auth)" />
-      <Stack.Screen name="(tabs)" />
-      <Stack.Screen name="play/[id]" options={{ animation: 'slide_from_bottom' }} />
-      <Stack.Screen name="review" options={{ animation: 'slide_from_bottom' }} />
-      <Stack.Screen name="sentences" options={{ animation: 'slide_from_bottom' }} />
-    </Stack>
+    <>
+      <NotificationsManager />
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          contentStyle: { backgroundColor: colors.background },
+        }}
+      >
+        <Stack.Screen name="onboarding" />
+        <Stack.Screen name="(auth)" />
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="play/[id]" options={{ animation: 'slide_from_bottom' }} />
+        <Stack.Screen name="review" options={{ animation: 'slide_from_bottom' }} />
+        <Stack.Screen name="sentences" options={{ animation: 'slide_from_bottom' }} />
+      </Stack>
+    </>
   );
 }
 

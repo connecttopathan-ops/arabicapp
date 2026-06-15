@@ -130,6 +130,9 @@ export interface UserSettings {
   onboarded: boolean;
   dailyGoalMinutes: number;
   placement: Placement | null;
+  reminderEnabled: boolean;
+  reminderHour: number;
+  reminderMinute: number;
 }
 
 /** SM-2 scheduling state for one reviewable item (per user). */
