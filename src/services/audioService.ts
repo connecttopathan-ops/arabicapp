@@ -14,6 +14,13 @@ import { createAudioPlayer, setAudioModeAsync, type AudioPlayer } from 'expo-aud
 
 let configured = false;
 let currentPlayer: AudioPlayer | null = null;
+let audioEnabled = true;
+
+/** Toggle audio playback app-wide (driven by user settings). */
+export function setAudioEnabled(enabled: boolean) {
+  audioEnabled = enabled;
+  if (!enabled) stopCurrent();
+}
 
 async function ensureConfigured() {
   if (configured) return;
@@ -46,6 +53,7 @@ interface PlayAudioOptions {
 }
 
 export async function playAudio({ audioUrl, text }: PlayAudioOptions): Promise<void> {
+  if (!audioEnabled) return; // respects the app-wide audio setting
   await ensureConfigured();
   stopCurrent(); // never overlap two sounds
 

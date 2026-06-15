@@ -14,6 +14,7 @@ import { LearnedToggle } from './LearnedToggle';
 import { SpeakerButton } from './SpeakerButton';
 import { playAudio } from '@/services/audioService';
 import { getExampleSentence } from '@/services/sentenceService';
+import { useSettings } from '@/context/SettingsContext';
 import { colors, radius, spacing, elevation } from '@/theme';
 import type { Word, Sentence } from '@/types/content';
 
@@ -24,6 +25,7 @@ interface WordCardProps {
 }
 
 export function WordCard({ word, learned = false, onToggleLearned }: WordCardProps) {
+  const { transliterationEnabled } = useSettings();
   const [revealed, setRevealed] = useState(false);
   const [showSentence, setShowSentence] = useState(false);
   const [sentence, setSentence] = useState<Sentence | null>(null);
@@ -78,7 +80,7 @@ export function WordCard({ word, learned = false, onToggleLearned }: WordCardPro
             <AppText variant="title" style={styles.lineCenter}>
               {word.english ?? '—'}
             </AppText>
-            {word.transliteration ? (
+            {word.transliteration && transliterationEnabled ? (
               <AppText variant="bodyStrong" color="primary" style={styles.lineCenter}>
                 {word.transliteration}
               </AppText>
@@ -102,7 +104,7 @@ export function WordCard({ word, learned = false, onToggleLearned }: WordCardPro
                 <ArabicText variant="arabicBody" center>
                   {sentence.arabic}
                 </ArabicText>
-                {sentence.transliteration ? (
+                {sentence.transliteration && transliterationEnabled ? (
                   <AppText variant="caption" color="textMuted" style={styles.lineCenter}>
                     {sentence.transliteration}
                   </AppText>

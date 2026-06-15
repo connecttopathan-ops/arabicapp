@@ -1,6 +1,6 @@
 /**
  * SettingsContext — onboarding state + preferences, available app-wide.
- * Drives the first-run gate and exposes the daily goal / placement.
+ * Drives the first-run gate and exposes all user preferences + setters.
  */
 import {
   createContext,
@@ -15,16 +15,20 @@ import { useAuth } from './AuthContext';
 import {
   loadSettings,
   completeOnboarding as persistOnboarding,
-  saveReminder,
+  updateSettings as persistUpdate,
   defaultReminderTime,
   DEFAULT_GOAL_MINUTES,
 } from '@/services/settingsService';
+import { setAudioEnabled } from '@/services/audioService';
 import type { Placement, UserSettings } from '@/types/content';
+
+type PrefsPatch = Partial<Omit<UserSettings, 'onboarded'>>;
 
 interface SettingsContextValue extends UserSettings {
   loading: boolean;
   completeOnboarding: (dailyGoalMinutes: number, placement: Placement | null) => Promise<void>;
   updateReminder: (enabled: boolean, hour: number, minute: number) => Promise<void>;
+  update: (patch: PrefsPatch) => Promise<void>;
 }
 
 const SettingsContext = createContext<SettingsContextValue | undefined>(undefined);
@@ -41,6 +45,9 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     reminderEnabled: false,
     reminderHour: defaultTime.hour,
     reminderMinute: defaultTime.minute,
+    transliterationEnabled: true,
+    audioEnabled: true,
+    theme: 'dark',
   });
   const [loading, setLoading] = useState(true);
 
@@ -48,13 +55,27 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     let active = true;
     setLoading(true);
     loadSettings(userId)
-      .then((s) => active && setSettings(s))
+      .then((s) => {
+        if (active) {
+          setSettings(s);
+          setAudioEnabled(s.audioEnabled);
+        }
+      })
       .catch(() => {})
       .finally(() => active && setLoading(false));
     return () => {
       active = false;
     };
   }, [userId]);
+
+  const update = useCallback(
+    async (patch: PrefsPatch) => {
+      setSettings((s) => ({ ...s, ...patch }));
+      if (patch.audioEnabled !== undefined) setAudioEnabled(patch.audioEnabled);
+      await persistUpdate(userId, patch);
+    },
+    [userId],
+  );
 
   const completeOnboarding = useCallback(
     async (dailyGoalMinutes: number, placement: Placement | null) => {
@@ -73,21 +94,14 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   );
 
   const updateReminder = useCallback(
-    async (enabled: boolean, hour: number, minute: number) => {
-      setSettings((s) => ({
-        ...s,
-        reminderEnabled: enabled,
-        reminderHour: hour,
-        reminderMinute: minute,
-      }));
-      await saveReminder(userId, enabled, hour, minute);
-    },
-    [userId],
+    (enabled: boolean, hour: number, minute: number) =>
+      update({ reminderEnabled: enabled, reminderHour: hour, reminderMinute: minute }),
+    [update],
   );
 
   const value = useMemo<SettingsContextValue>(
-    () => ({ ...settings, loading, completeOnboarding, updateReminder }),
-    [settings, loading, completeOnboarding, updateReminder],
+    () => ({ ...settings, loading, completeOnboarding, updateReminder, update }),
+    [settings, loading, completeOnboarding, updateReminder, update],
   );
 
   return <SettingsContext.Provider value={value}>{children}</SettingsContext.Provider>;

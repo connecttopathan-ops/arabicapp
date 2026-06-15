@@ -4,6 +4,7 @@
  */
 import { Pressable, StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useSettings } from '@/context/SettingsContext';
 import { colors, radius, spacing } from '@/theme';
 
 interface SpeakerButtonProps {
@@ -12,6 +13,8 @@ interface SpeakerButtonProps {
 }
 
 export function SpeakerButton({ onPress, style }: SpeakerButtonProps) {
+  const { audioEnabled } = useSettings();
+  if (!audioEnabled) return null; // hidden when audio is turned off in Settings
   return (
     <Pressable
       onPress={onPress}

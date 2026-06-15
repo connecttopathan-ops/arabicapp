@@ -125,6 +125,8 @@ export interface LessonWithSteps {
 /** Onboarding placement self-assessment. */
 export type Placement = 'beginner' | 'some' | 'can_read';
 
+export type ThemePreference = 'dark' | 'light';
+
 /** User preferences captured in onboarding. */
 export interface UserSettings {
   onboarded: boolean;
@@ -133,6 +135,9 @@ export interface UserSettings {
   reminderEnabled: boolean;
   reminderHour: number;
   reminderMinute: number;
+  transliterationEnabled: boolean;
+  audioEnabled: boolean;
+  theme: ThemePreference;
 }
 
 /** SM-2 scheduling state for one reviewable item (per user). */

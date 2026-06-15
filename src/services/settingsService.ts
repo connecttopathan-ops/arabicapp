@@ -1,15 +1,14 @@
 /**
- * Settings service — onboarding state and preferences (daily goal, placement,
- * reminder time/toggle).
+ * Settings service — onboarding state and preferences.
  *
- * The "onboarded" flag is device-local (controls the first-run flow). The daily
- * goal, placement, and reminder settings also sync to Supabase (`user_settings`)
- * for signed-in users so preferences follow them.
+ * The "onboarded" flag is device-local (controls the first-run flow). All other
+ * preferences (daily goal, placement, reminder, transliteration, audio, theme)
+ * persist locally and sync to Supabase (`user_settings`) for signed-in users.
  */
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '@/lib/supabase';
 import { cacheGet, cacheSet } from '@/lib/cache';
-import type { Placement, UserSettings } from '@/types/content';
+import type { Placement, ThemePreference, UserSettings } from '@/types/content';
 
 const ONBOARDED_KEY = 'masar.onboarded';
 const LOCAL_PREFS = 'settings'; // cache helper namespaces this
@@ -29,6 +28,9 @@ interface LocalPrefs {
   reminderEnabled: boolean;
   reminderHour: number;
   reminderMinute: number;
+  transliterationEnabled: boolean;
+  audioEnabled: boolean;
+  theme: ThemePreference;
 }
 
 async function loadLocalPrefs(): Promise<LocalPrefs> {
@@ -41,7 +43,24 @@ async function loadLocalPrefs(): Promise<LocalPrefs> {
     reminderEnabled: local?.reminderEnabled ?? false,
     reminderHour: local?.reminderHour ?? time.hour,
     reminderMinute: local?.reminderMinute ?? time.minute,
+    transliterationEnabled: local?.transliterationEnabled ?? true,
+    audioEnabled: local?.audioEnabled ?? true,
+    theme: local?.theme ?? 'dark',
   };
+}
+
+/** Map camelCase prefs to the snake_case `user_settings` columns. */
+function toCloud(partial: Partial<LocalPrefs>): Record<string, unknown> {
+  const out: Record<string, unknown> = {};
+  if ('dailyGoalMinutes' in partial) out.daily_goal_minutes = partial.dailyGoalMinutes;
+  if ('placement' in partial) out.placement = partial.placement;
+  if ('reminderEnabled' in partial) out.reminder_enabled = partial.reminderEnabled;
+  if ('reminderHour' in partial) out.reminder_hour = partial.reminderHour;
+  if ('reminderMinute' in partial) out.reminder_minute = partial.reminderMinute;
+  if ('transliterationEnabled' in partial) out.transliteration_enabled = partial.transliterationEnabled;
+  if ('audioEnabled' in partial) out.audio_enabled = partial.audioEnabled;
+  if ('theme' in partial) out.theme = partial.theme;
+  return out;
 }
 
 export async function loadSettings(userId: string | null): Promise<UserSettings> {
@@ -52,7 +71,9 @@ export async function loadSettings(userId: string | null): Promise<UserSettings>
     try {
       const { data } = await supabase
         .from('user_settings')
-        .select('daily_goal_minutes, placement, reminder_enabled, reminder_hour, reminder_minute')
+        .select(
+          'daily_goal_minutes, placement, reminder_enabled, reminder_hour, reminder_minute, transliteration_enabled, audio_enabled, theme',
+        )
         .eq('user_id', userId)
         .maybeSingle();
       if (data) {
@@ -61,8 +82,17 @@ export async function loadSettings(userId: string | null): Promise<UserSettings>
         if (data.reminder_enabled != null) prefs.reminderEnabled = data.reminder_enabled;
         if (data.reminder_hour != null) prefs.reminderHour = data.reminder_hour;
         if (data.reminder_minute != null) prefs.reminderMinute = data.reminder_minute;
+        if (data.transliteration_enabled != null)
+          prefs.transliterationEnabled = data.transliteration_enabled;
+        if (data.audio_enabled != null) prefs.audioEnabled = data.audio_enabled;
+        if (data.theme != null) prefs.theme = data.theme;
       } else if (onboarded) {
-        await pushCloud(userId, prefs, true);
+        await supabase
+          .from('user_settings')
+          .upsert(
+            { user_id: userId, onboarded: true, ...toCloud(prefs), updated_at: new Date().toISOString() },
+            { onConflict: 'user_id' },
+          );
       }
     } catch {
       // offline — local values are fine
@@ -72,67 +102,52 @@ export async function loadSettings(userId: string | null): Promise<UserSettings>
   return { onboarded, ...prefs };
 }
 
-async function pushCloud(userId: string, prefs: LocalPrefs, onboarded: boolean) {
-  await supabase.from('user_settings').upsert(
-    {
-      user_id: userId,
-      onboarded,
-      daily_goal_minutes: prefs.dailyGoalMinutes,
-      placement: prefs.placement,
-      reminder_enabled: prefs.reminderEnabled,
-      reminder_hour: prefs.reminderHour,
-      reminder_minute: prefs.reminderMinute,
-      updated_at: new Date().toISOString(),
-    },
-    { onConflict: 'user_id' },
-  );
-}
-
 export async function completeOnboarding(
   userId: string | null,
   dailyGoalMinutes: number,
   placement: Placement | null,
 ): Promise<void> {
   const time = defaultReminderTime(dailyGoalMinutes);
-  const prefs: LocalPrefs = {
+  const prefs = await loadLocalPrefs();
+  const next: LocalPrefs = {
+    ...prefs,
     dailyGoalMinutes,
     placement,
-    reminderEnabled: false,
     reminderHour: time.hour,
     reminderMinute: time.minute,
   };
   await AsyncStorage.setItem(ONBOARDED_KEY, 'true');
-  await cacheSet<LocalPrefs>(LOCAL_PREFS, prefs);
+  await cacheSet<LocalPrefs>(LOCAL_PREFS, next);
   if (userId) {
     try {
-      await pushCloud(userId, prefs, true);
+      await supabase
+        .from('user_settings')
+        .upsert(
+          { user_id: userId, onboarded: true, ...toCloud(next), updated_at: new Date().toISOString() },
+          { onConflict: 'user_id' },
+        );
     } catch {
       // best-effort
     }
   }
 }
 
-export async function saveReminder(
+/** Merge a partial preference change into local storage (and cloud if signed in). */
+export async function updateSettings(
   userId: string | null,
-  reminderEnabled: boolean,
-  reminderHour: number,
-  reminderMinute: number,
+  partial: Partial<LocalPrefs>,
 ): Promise<void> {
   const prefs = await loadLocalPrefs();
-  const next: LocalPrefs = { ...prefs, reminderEnabled, reminderHour, reminderMinute };
+  const next = { ...prefs, ...partial };
   await cacheSet<LocalPrefs>(LOCAL_PREFS, next);
   if (userId) {
     try {
-      await supabase.from('user_settings').upsert(
-        {
-          user_id: userId,
-          reminder_enabled: reminderEnabled,
-          reminder_hour: reminderHour,
-          reminder_minute: reminderMinute,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: 'user_id' },
-      );
+      await supabase
+        .from('user_settings')
+        .upsert(
+          { user_id: userId, ...toCloud(partial), updated_at: new Date().toISOString() },
+          { onConflict: 'user_id' },
+        );
     } catch {
       // best-effort
     }

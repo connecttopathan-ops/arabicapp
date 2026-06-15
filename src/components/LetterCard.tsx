@@ -11,6 +11,7 @@ import { AppText } from './AppText';
 import { LearnedToggle } from './LearnedToggle';
 import { SpeakerButton } from './SpeakerButton';
 import { playAudio } from '@/services/audioService';
+import { useSettings } from '@/context/SettingsContext';
 import { colors, radius, spacing, elevation } from '@/theme';
 import type { Letter } from '@/types/content';
 
@@ -21,6 +22,7 @@ interface LetterCardProps {
 }
 
 export function LetterCard({ letter, learned = false, onToggleLearned }: LetterCardProps) {
+  const { transliterationEnabled } = useSettings();
   const [revealed, setRevealed] = useState(false);
 
   return (
@@ -51,7 +53,7 @@ export function LetterCard({ letter, learned = false, onToggleLearned }: LetterC
             <AppText variant="title" style={styles.lineCenter}>
               {letter.name}
             </AppText>
-            {letter.transliteration ? (
+            {letter.transliteration && transliterationEnabled ? (
               <AppText variant="bodyStrong" color="primary" style={styles.lineCenter}>
                 {letter.transliteration}
               </AppText>
