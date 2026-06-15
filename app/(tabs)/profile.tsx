@@ -7,12 +7,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { Screen, AppText, Card } from '@/components';
 import { useAuth } from '@/context/AuthContext';
 import { useSettings } from '@/context/SettingsContext';
-import { colors, spacing, radius } from '@/theme';
+import { useTheme, useThemedStyles, spacing, radius, type ThemeColors } from '@/theme';
 
 export default function ProfileScreen() {
   const router = useRouter();
   const { user, isGuest } = useAuth();
   const { dailyGoalMinutes, reminderEnabled } = useSettings();
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
 
   const displayName = isGuest ? 'Guest' : user?.email ?? 'Signed in';
   const subtitle = isGuest ? 'You’re exploring without an account' : 'Signed in with email';
@@ -33,7 +35,7 @@ export default function ProfileScreen() {
 
       <Card style={styles.goalCard}>
         <View style={styles.row}>
-          <Ionicons name="flag-outline" size={20} color={colors.secondary} />
+          <Ionicons name="flag-outline" size={20} color={colors.accent} />
           <AppText variant="bodyStrong">Daily goal</AppText>
         </View>
         <AppText variant="body" color="textMuted">
@@ -46,7 +48,7 @@ export default function ProfileScreen() {
         accessibilityRole="button"
         style={({ pressed }) => [styles.settingsRow, pressed && styles.pressed]}
       >
-        <Ionicons name="settings-outline" size={20} color={colors.secondary} />
+        <Ionicons name="settings-outline" size={20} color={colors.accent} />
         <AppText variant="bodyStrong" style={styles.settingsLabel}>
           Settings
         </AppText>
@@ -56,7 +58,7 @@ export default function ProfileScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   header: {
     alignItems: 'center',
     gap: spacing.xs,

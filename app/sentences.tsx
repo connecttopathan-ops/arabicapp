@@ -12,11 +12,13 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { AppText, ProgressBar, StepChoice, Button, ClozeSentence } from '@/components';
 import { getClozeBatch, buildClozeStep, type ClozeBatch } from '@/services/sentenceService';
-import { colors, spacing, layout, radius } from '@/theme';
+import { useTheme, useThemedStyles, spacing, layout, radius, type ThemeColors } from '@/theme';
 
 export default function SentenceMode() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
 
   const [batch, setBatch] = useState<ClozeBatch | null>(null);
   const [index, setIndex] = useState(0);
@@ -119,7 +121,7 @@ export default function SentenceMode() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: colors.background,

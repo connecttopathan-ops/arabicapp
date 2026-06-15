@@ -18,13 +18,14 @@ import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { ProgressProvider } from '@/context/ProgressContext';
 import { SettingsProvider, useSettings } from '@/context/SettingsContext';
 import { NotificationsManager } from '@/components';
-import { colors, fontAssets } from '@/theme';
+import { ThemeProvider, useTheme, fontAssets } from '@/theme';
 
 SplashScreen.preventAutoHideAsync();
 
 function RootNavigator() {
   const { isAuthed, initializing } = useAuth();
   const { onboarded, loading: settingsLoading } = useSettings();
+  const { colors, mode } = useTheme();
   const segments = useSegments();
   const router = useRouter();
 
@@ -56,6 +57,7 @@ function RootNavigator() {
 
   return (
     <>
+      <StatusBar style={mode === 'light' ? 'dark' : 'light'} />
       <NotificationsManager />
       <Stack
         screenOptions={{
@@ -88,10 +90,11 @@ export default function RootLayout() {
       <SafeAreaProvider>
         <AuthProvider>
           <SettingsProvider>
-            <ProgressProvider>
-              <StatusBar style="light" />
-              <RootNavigator />
-            </ProgressProvider>
+            <ThemeProvider>
+              <ProgressProvider>
+                <RootNavigator />
+              </ProgressProvider>
+            </ThemeProvider>
           </SettingsProvider>
         </AuthProvider>
       </SafeAreaProvider>

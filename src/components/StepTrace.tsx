@@ -11,12 +11,14 @@ import Svg, { Polyline } from 'react-native-svg';
 import { ArabicText } from './ArabicText';
 import { AppText } from './AppText';
 import { Button } from './Button';
-import { colors, radius, spacing, layout, palette } from '@/theme';
+import { useTheme, useThemedStyles, radius, spacing, layout, type ThemeColors } from '@/theme';
 import type { LessonStep, Letter } from '@/types/content';
 
 const DONE_THRESHOLD = 18; // total points before tracing counts as complete
 
 export function StepTrace({ step, onNext }: { step: LessonStep; onNext: () => void }) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const { width } = useWindowDimensions();
   const size = Math.min(width - layout.screenPadding * 2, 320);
 
@@ -70,7 +72,7 @@ export function StepTrace({ step, onNext }: { step: LessonStep; onNext: () => vo
                 key={i}
                 points={pts.join(' ')}
                 fill="none"
-                stroke={palette.gold}
+                stroke={colors.primary}
                 strokeWidth={12}
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -88,7 +90,7 @@ export function StepTrace({ step, onNext }: { step: LessonStep; onNext: () => vo
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   wrap: {
     flex: 1,
     justifyContent: 'center',

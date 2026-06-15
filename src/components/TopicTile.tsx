@@ -6,7 +6,7 @@
 import { Pressable, View, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AppText } from './AppText';
-import { jewel, colors, spacing, radius, elevation } from '@/theme';
+import { useTheme, useThemedStyles, spacing, radius, elevation, type ThemeColors } from '@/theme';
 import type { Topic } from '@/types/content';
 
 interface TopicTileProps {
@@ -15,6 +15,8 @@ interface TopicTileProps {
 }
 
 export function TopicTile({ topic, onPress }: TopicTileProps) {
+  const { jewel } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const tone = jewel[topic.tone];
 
   return (
@@ -43,7 +45,7 @@ export function TopicTile({ topic, onPress }: TopicTileProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   tile: {
     flex: 1,
     minHeight: 132,

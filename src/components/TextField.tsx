@@ -4,7 +4,7 @@
 import { useState } from 'react';
 import { View, TextInput, StyleSheet, type TextInputProps } from 'react-native';
 import { AppText } from './AppText';
-import { colors, radius, spacing, family } from '@/theme';
+import { useTheme, useThemedStyles, radius, spacing, family, type ThemeColors } from '@/theme';
 
 interface TextFieldProps extends TextInputProps {
   label?: string;
@@ -12,6 +12,8 @@ interface TextFieldProps extends TextInputProps {
 }
 
 export function TextField({ label, error, style, onFocus, onBlur, ...rest }: TextFieldProps) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const [focused, setFocused] = useState(false);
 
   return (
@@ -49,7 +51,7 @@ export function TextField({ label, error, style, onFocus, onBlur, ...rest }: Tex
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   wrap: {
     gap: spacing.xs,
   },

@@ -8,7 +8,7 @@
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { StyleSheet, type ColorValue } from 'react-native';
-import { colors, family } from '@/theme';
+import { useTheme, useThemedStyles, family, type ThemeColors } from '@/theme';
 import type { IconName } from '@/types/content';
 
 function tabIcon(focused: IconName, unfocused: IconName) {
@@ -18,6 +18,8 @@ function tabIcon(focused: IconName, unfocused: IconName) {
 }
 
 export default function TabsLayout() {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   return (
     <Tabs
       screenOptions={{
@@ -62,7 +64,7 @@ export default function TabsLayout() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   tabBar: {
     backgroundColor: colors.tabBar,
     borderTopColor: colors.border,

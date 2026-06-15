@@ -5,7 +5,7 @@
 import { Pressable, StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSettings } from '@/context/SettingsContext';
-import { colors, radius, spacing } from '@/theme';
+import { useTheme, useThemedStyles, radius, spacing, type ThemeColors } from '@/theme';
 
 interface SpeakerButtonProps {
   onPress?: () => void;
@@ -14,6 +14,8 @@ interface SpeakerButtonProps {
 
 export function SpeakerButton({ onPress, style }: SpeakerButtonProps) {
   const { audioEnabled } = useSettings();
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   if (!audioEnabled) return null; // hidden when audio is turned off in Settings
   return (
     <Pressable
@@ -28,7 +30,7 @@ export function SpeakerButton({ onPress, style }: SpeakerButtonProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   button: {
     width: 52,
     height: 52,

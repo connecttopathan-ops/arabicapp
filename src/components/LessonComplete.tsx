@@ -7,7 +7,7 @@ import { View, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AppText } from './AppText';
 import { Button } from './Button';
-import { colors, radius, spacing } from '@/theme';
+import { useTheme, useThemedStyles, radius, spacing, type ThemeColors } from '@/theme';
 import type { Lesson } from '@/types/content';
 
 interface LessonCompleteProps {
@@ -18,6 +18,8 @@ interface LessonCompleteProps {
 }
 
 export function LessonComplete({ lesson, score, total, onDone }: LessonCompleteProps) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   return (
     <View style={styles.wrap}>
       <View style={styles.badge}>
@@ -57,7 +59,7 @@ export function LessonComplete({ lesson, score, total, onDone }: LessonCompleteP
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   wrap: {
     flex: 1,
     justifyContent: 'center',

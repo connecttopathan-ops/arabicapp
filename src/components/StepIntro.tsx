@@ -9,11 +9,12 @@ import { Button } from './Button';
 import { SpeakerButton } from './SpeakerButton';
 import { playAudio } from '@/services/audioService';
 import { useSettings } from '@/context/SettingsContext';
-import { colors, radius, spacing } from '@/theme';
+import { useThemedStyles, radius, spacing, type ThemeColors } from '@/theme';
 import type { LessonStep, Letter, Word } from '@/types/content';
 
 export function StepIntro({ step, onNext }: { step: LessonStep; onNext: () => void }) {
   const { transliterationEnabled } = useSettings();
+  const styles = useThemedStyles(makeStyles);
   const isLetter = step.itemType === 'letter';
   const letter = isLetter ? (step.item as Letter | null) : null;
   const word = !isLetter ? (step.item as Word | null) : null;
@@ -64,7 +65,7 @@ export function StepIntro({ step, onNext }: { step: LessonStep; onNext: () => vo
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   wrap: {
     flex: 1,
     justifyContent: 'center',

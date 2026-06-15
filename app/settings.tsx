@@ -12,7 +12,7 @@ import { useSettings } from '@/context/SettingsContext';
 import { useAuth } from '@/context/AuthContext';
 import { ensurePermission, sendTestNotification } from '@/services/notificationsService';
 import { formatTime } from '@/lib/time';
-import { colors, spacing, radius, layout } from '@/theme';
+import { useTheme, useThemedStyles, spacing, radius, layout, type ThemeColors } from '@/theme';
 
 const TIME_PRESETS = [
   { hour: 8, minute: 0 },
@@ -36,6 +36,8 @@ export default function SettingsScreen() {
     updateReminder,
   } = useSettings();
   const { user, isGuest, signOut } = useAuth();
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
 
   const [busy, setBusy] = useState(false);
 
@@ -144,13 +146,13 @@ export default function SettingsScreen() {
             ))}
           </View>
           <AppText variant="caption" color="textFaint" style={styles.themeNote}>
-            Light theme is coming soon — your choice is saved for when it lands.
+            Switch between a warm dark and a warm light theme.
           </AppText>
         </Section>
 
         <Section title="Account">
           <View style={styles.accountRow}>
-            <Ionicons name={isGuest ? 'person-outline' : 'person'} size={20} color={colors.secondary} />
+            <Ionicons name={isGuest ? 'person-outline' : 'person'} size={20} color={colors.accent} />
             <View style={styles.accountText}>
               <AppText variant="bodyStrong">{isGuest ? 'Guest' : user?.email ?? 'Signed in'}</AppText>
               <AppText variant="caption" color="textMuted">
@@ -170,6 +172,7 @@ export default function SettingsScreen() {
 }
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
+  const styles = useThemedStyles(makeStyles);
   return (
     <View style={styles.section}>
       <AppText variant="overline" color="textMuted" style={styles.sectionTitle}>
@@ -193,9 +196,11 @@ function ToggleRow({
   value: boolean;
   onValueChange: (v: boolean) => void;
 }) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   return (
     <View style={styles.toggleRow}>
-      <Ionicons name={icon} size={20} color={colors.secondary} />
+      <Ionicons name={icon} size={20} color={colors.accent} />
       <View style={styles.toggleText}>
         <AppText variant="bodyStrong">{label}</AppText>
         <AppText variant="caption" color="textMuted">
@@ -205,7 +210,7 @@ function ToggleRow({
       <Switch
         value={value}
         onValueChange={onValueChange}
-        trackColor={{ true: colors.secondary, false: colors.well }}
+        trackColor={{ true: colors.accent, false: colors.well }}
         thumbColor={colors.text}
       />
     </View>
@@ -213,10 +218,11 @@ function ToggleRow({
 }
 
 function Divider() {
+  const styles = useThemedStyles(makeStyles);
   return <View style={styles.divider} />;
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: colors.background,

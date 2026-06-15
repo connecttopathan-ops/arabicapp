@@ -5,7 +5,7 @@
 import { View, StyleSheet } from 'react-native';
 import { ArabicText } from './ArabicText';
 import { AppText } from './AppText';
-import { colors, radius, spacing } from '@/theme';
+import { useThemedStyles, radius, spacing, type ThemeColors } from '@/theme';
 import type { LetterForm } from '@/types/content';
 
 const SLOTS: { key: keyof Pick<LetterForm, 'isolated' | 'initial' | 'medial' | 'final'>; label: string }[] = [
@@ -16,6 +16,7 @@ const SLOTS: { key: keyof Pick<LetterForm, 'isolated' | 'initial' | 'medial' | '
 ];
 
 export function LetterFormRow({ form }: { form: LetterForm }) {
+  const styles = useThemedStyles(makeStyles);
   return (
     <View style={styles.card}>
       <View style={styles.header}>
@@ -24,7 +25,7 @@ export function LetterFormRow({ form }: { form: LetterForm }) {
         </AppText>
         {form.sound ? (
           <View style={styles.soundChip}>
-            <AppText variant="overline" color="secondary">
+            <AppText variant="overline" color="accent">
               {form.sound}
             </AppText>
           </View>
@@ -60,7 +61,7 @@ export function LetterFormRow({ form }: { form: LetterForm }) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   card: {
     backgroundColor: colors.card,
     borderRadius: radius.lg,

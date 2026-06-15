@@ -23,7 +23,7 @@ import { useHomeData } from '@/hooks/useHomeData';
 import { useProgress } from '@/context/ProgressContext';
 import { useStats } from '@/hooks/useStats';
 import { useAuth } from '@/context/AuthContext';
-import { colors, spacing, radius } from '@/theme';
+import { useTheme, useThemedStyles, spacing, radius, type ThemeColors } from '@/theme';
 import type { UserProgress } from '@/types/content';
 
 function displayName(email: string | undefined | null): string {
@@ -37,6 +37,8 @@ export default function HomeScreen() {
   const { learnedCount } = useProgress();
   const stats = useStats();
   const { session, isGuest } = useAuth();
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const router = useRouter();
 
   if (loading) {
@@ -123,7 +125,7 @@ export default function HomeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   centered: {
     flex: 1,
     alignItems: 'center',

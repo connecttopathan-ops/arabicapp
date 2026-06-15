@@ -8,7 +8,7 @@ import { Card } from './Card';
 import { AppText } from './AppText';
 import { ArabicText } from './ArabicText';
 import { ProgressBar } from './ProgressBar';
-import { colors, spacing, radius, palette } from '@/theme';
+import { useTheme, useThemedStyles, spacing, radius, type ThemeColors } from '@/theme';
 import type { UserProgress } from '@/types/content';
 
 interface HeroCardProps {
@@ -16,6 +16,8 @@ interface HeroCardProps {
 }
 
 export function HeroCard({ progress }: HeroCardProps) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const { name, streakDays, level, levelTitle, xp, xpToNext } = progress;
   const xpRatio = xpToNext > 0 ? xp / xpToNext : 0;
 
@@ -35,7 +37,7 @@ export function HeroCard({ progress }: HeroCardProps) {
         </View>
 
         <View style={styles.streakChip}>
-          <Ionicons name="flame" size={18} color={palette.gold} />
+          <Ionicons name="flame" size={18} color={colors.primary} />
           <AppText variant="bodyStrong" color="primary" style={styles.streakNum}>
             {streakDays}
           </AppText>
@@ -60,7 +62,7 @@ export function HeroCard({ progress }: HeroCardProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   card: {
     gap: spacing['2xl'],
   },

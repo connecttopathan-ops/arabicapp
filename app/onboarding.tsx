@@ -11,7 +11,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { AppText, ArabicText, Button } from '@/components';
 import { useSettings } from '@/context/SettingsContext';
 import { DEFAULT_GOAL_MINUTES } from '@/services/settingsService';
-import { colors, spacing, radius, layout } from '@/theme';
+import { useTheme, useThemedStyles, spacing, radius, layout, type ThemeColors } from '@/theme';
 import type { Placement } from '@/types/content';
 
 const PLACEMENTS: { value: Placement; label: string; hint: string }[] = [
@@ -29,6 +29,8 @@ const GOALS: { minutes: number; label: string; hint: string }[] = [
 export default function Onboarding() {
   const insets = useSafeAreaInsets();
   const { completeOnboarding } = useSettings();
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
 
   const [step, setStep] = useState(0);
   const [placement, setPlacement] = useState<Placement | null>(null);
@@ -159,6 +161,8 @@ function OptionRow({
   selected: boolean;
   onPress: () => void;
 }) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   return (
     <Pressable
       onPress={onPress}
@@ -181,7 +185,7 @@ function OptionRow({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: colors.background,

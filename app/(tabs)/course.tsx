@@ -35,7 +35,7 @@ import {
 } from '@/hooks/useContent';
 import { useProgress } from '@/context/ProgressContext';
 import { useSettings } from '@/context/SettingsContext';
-import { colors, spacing, radius, layout } from '@/theme';
+import { useTheme, useThemedStyles, spacing, radius, layout, type ThemeColors } from '@/theme';
 import type { Letter, Word } from '@/types/content';
 
 type Tab = 'alphabet' | 'vocab' | 'forms' | 'breakdown';
@@ -56,6 +56,8 @@ export default function CourseScreen() {
   const breakdowns = useWordBreakdowns();
   const { isLearned, toggle } = useProgress();
   const { placement } = useSettings();
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
 
   // Start readers on Vocabulary, beginners on the Alphabet (from onboarding).
   const [tab, setTab] = useState<Tab>(placement === 'can_read' ? 'vocab' : 'alphabet');
@@ -216,6 +218,7 @@ export default function CourseScreen() {
 }
 
 function EmptyNote() {
+  const styles = useThemedStyles(makeStyles);
   return (
     <View style={styles.empty}>
       <AppText variant="body" color="textMuted" style={styles.emptyText}>
@@ -225,7 +228,7 @@ function EmptyNote() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: colors.background,

@@ -14,7 +14,7 @@ import { useReview } from '@/hooks/useReview';
 import { buildReviewStep } from '@/services/reviewService';
 import { recordActivity, REVIEW_XP_PER_CORRECT } from '@/services/statsService';
 import { useAuth } from '@/context/AuthContext';
-import { colors, spacing, layout, radius } from '@/theme';
+import { useTheme, useThemedStyles, spacing, layout, radius, type ThemeColors } from '@/theme';
 import type { ReviewItem } from '@/types/content';
 
 export default function ReviewSession() {
@@ -22,6 +22,8 @@ export default function ReviewSession() {
   const insets = useSafeAreaInsets();
   const { loading, due, submit, allLetters, allWords } = useReview();
   const { session } = useAuth();
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const userId = session?.user?.id ?? null;
 
   // Snapshot the due list once so it doesn't shrink under us as we answer.
@@ -113,7 +115,7 @@ export default function ReviewSession() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: colors.background,

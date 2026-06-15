@@ -6,7 +6,7 @@
 import { View, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AppText } from './AppText';
-import { colors, spacing, radius } from '@/theme';
+import { useTheme, useThemedStyles, spacing, radius, type ThemeColors } from '@/theme';
 import type { IconName } from '@/types/content';
 
 interface PlaceholderProps {
@@ -16,6 +16,8 @@ interface PlaceholderProps {
 }
 
 export function Placeholder({ icon, title, message }: PlaceholderProps) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   return (
     <View style={styles.wrap}>
       <View style={styles.iconChip}>
@@ -31,7 +33,7 @@ export function Placeholder({ icon, title, message }: PlaceholderProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   wrap: {
     flex: 1,
     alignItems: 'center',

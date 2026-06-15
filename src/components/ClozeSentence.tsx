@@ -8,7 +8,7 @@
  * run of tatweel (kashida), which renders as a natural Arabic baseline line.
  */
 import { Text, StyleSheet } from 'react-native';
-import { colors, family } from '@/theme';
+import { useThemedStyles, family, type ThemeColors } from '@/theme';
 
 interface ClozeSentenceProps {
   arabic: string;
@@ -20,6 +20,7 @@ interface ClozeSentenceProps {
 const BLANK = 'ـــــ'; // five tatweel characters
 
 export function ClozeSentence({ arabic, target, filled = false }: ClozeSentenceProps) {
+  const styles = useThemedStyles(makeStyles);
   const idx = target ? arabic.indexOf(target) : -1;
 
   if (idx === -1) {
@@ -42,7 +43,7 @@ export function ClozeSentence({ arabic, target, filled = false }: ClozeSentenceP
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   sentence: {
     fontFamily: family.arabic,
     fontSize: 26,

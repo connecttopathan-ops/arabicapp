@@ -12,7 +12,7 @@
 import { Pressable, ActivityIndicator, View, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AppText } from './AppText';
-import { colors, radius, spacing, palette } from '@/theme';
+import { useTheme, useThemedStyles, radius, spacing, type ThemeColors } from '@/theme';
 import type { IconName } from '@/types/content';
 
 type Variant = 'primary' | 'secondary' | 'ghost';
@@ -36,6 +36,8 @@ export function Button({
   icon,
   hint,
 }: ButtonProps) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const isDisabled = disabled || loading;
   const labelColor =
     variant === 'primary' ? 'textOnAccent' : variant === 'secondary' ? 'text' : 'primary';
@@ -56,7 +58,7 @@ export function Button({
       ]}
     >
       {loading ? (
-        <ActivityIndicator color={variant === 'primary' ? palette.espresso : colors.primary} />
+        <ActivityIndicator color={variant === 'primary' ? colors.textOnAccent : colors.primary} />
       ) : (
         <View style={styles.content}>
           {icon ? (
@@ -81,7 +83,7 @@ export function Button({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   base: {
     height: 52,
     borderRadius: radius.lg,

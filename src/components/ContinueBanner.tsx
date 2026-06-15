@@ -8,7 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { AppText } from './AppText';
 import { ArabicText } from './ArabicText';
 import { ProgressBar } from './ProgressBar';
-import { colors, spacing, radius, elevation, palette } from '@/theme';
+import { useTheme, useThemedStyles, spacing, radius, elevation, type ThemeColors } from '@/theme';
 import type { ContinueLesson } from '@/types/content';
 
 interface ContinueBannerProps {
@@ -17,6 +17,8 @@ interface ContinueBannerProps {
 }
 
 export function ContinueBanner({ lesson, onPress }: ContinueBannerProps) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const pct = Math.round(Math.max(0, Math.min(1, lesson.progress)) * 100);
 
   return (
@@ -39,18 +41,23 @@ export function ContinueBanner({ lesson, onPress }: ContinueBannerProps) {
               {lesson.arabicTitle}
             </ArabicText>
           </View>
-          <AppText variant="caption" style={styles.subtitle}>
+          <AppText variant="caption" color="textOnAccent" style={styles.subtitle}>
             {lesson.subtitle}
           </AppText>
         </View>
 
         <View style={styles.playButton}>
-          <Ionicons name="play" size={22} color={palette.gold} />
+          <Ionicons name="play" size={22} color={colors.primary} />
         </View>
       </View>
 
       <View style={styles.progressRow}>
-        <ProgressBar value={lesson.progress} color={palette.espresso} trackColor="rgba(26,21,18,0.25)" height={8} />
+        <ProgressBar
+          value={lesson.progress}
+          color={colors.textOnAccent}
+          trackColor={colors.primaryPressed}
+          height={8}
+        />
         <AppText variant="label" color="textOnAccent" style={styles.pct}>
           {pct}%
         </AppText>
@@ -59,7 +66,7 @@ export function ContinueBanner({ lesson, onPress }: ContinueBannerProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   banner: {
     backgroundColor: colors.primary,
     borderRadius: radius.xl,
@@ -92,13 +99,13 @@ const styles = StyleSheet.create({
     flexShrink: 1,
   },
   subtitle: {
-    color: 'rgba(26,21,18,0.7)',
+    opacity: 0.7,
   },
   playButton: {
     width: 48,
     height: 48,
     borderRadius: radius.pill,
-    backgroundColor: palette.espresso,
+    backgroundColor: colors.textOnAccent,
     alignItems: 'center',
     justifyContent: 'center',
   },

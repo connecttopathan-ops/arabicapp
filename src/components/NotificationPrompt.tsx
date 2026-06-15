@@ -12,13 +12,15 @@ import { Button } from './Button';
 import { useSettings } from '@/context/SettingsContext';
 import { ensurePermission } from '@/services/notificationsService';
 import { formatTime } from '@/lib/time';
-import { colors, spacing, radius } from '@/theme';
+import { useTheme, useThemedStyles, spacing, radius, type ThemeColors } from '@/theme';
 
 const SEEN_KEY = 'masar.reminderPromptSeen';
 
 export function NotificationPrompt() {
   const { loading, onboarded, reminderEnabled, reminderHour, reminderMinute, updateReminder } =
     useSettings();
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -69,10 +71,10 @@ export function NotificationPrompt() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.6)',
+    backgroundColor: colors.overlay,
     justifyContent: 'center',
     padding: spacing.xl,
   },

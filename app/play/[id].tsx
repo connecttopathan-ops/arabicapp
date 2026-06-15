@@ -22,7 +22,7 @@ import { useLesson } from '@/hooks/useContent';
 import { useProgress } from '@/context/ProgressContext';
 import { useAuth } from '@/context/AuthContext';
 import { recordActivity } from '@/services/statsService';
-import { colors, spacing, layout } from '@/theme';
+import { useTheme, useThemedStyles, spacing, layout, type ThemeColors } from '@/theme';
 
 export default function LessonPlayer() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -31,6 +31,8 @@ export default function LessonPlayer() {
   const { data, loading } = useLesson(id);
   const { markLearned, isLearned } = useProgress();
   const { session } = useAuth();
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const userId = session?.user?.id ?? null;
 
   const [index, setIndex] = useState(0);
@@ -126,7 +128,7 @@ export default function LessonPlayer() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: colors.background,

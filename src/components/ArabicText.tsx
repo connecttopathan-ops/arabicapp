@@ -8,10 +8,9 @@
  * It defaults to the Naskh font and an Arabic-tuned line height.
  */
 import { Text, type TextProps, type TextStyle } from 'react-native';
-import { colors, preset } from '@/theme';
+import { useTheme, preset, type ColorKey } from '@/theme';
 
 type ArabicVariant = 'arabicLarge' | 'arabicBody';
-type ColorKey = keyof typeof colors;
 
 interface ArabicTextProps extends TextProps {
   variant?: ArabicVariant;
@@ -27,6 +26,7 @@ export function ArabicText({
   style,
   ...rest
 }: ArabicTextProps) {
+  const { colors } = useTheme();
   return (
     <Text
       // Helps screen readers and layout engines treat this as Arabic.

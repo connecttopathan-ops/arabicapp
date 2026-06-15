@@ -8,11 +8,13 @@ import { Ionicons } from '@expo/vector-icons';
 import { Screen, AppText } from '@/components';
 import { useLessons } from '@/hooks/useContent';
 import { useProgress } from '@/context/ProgressContext';
-import { colors, spacing, radius } from '@/theme';
+import { useTheme, useThemedStyles, spacing, radius, type ThemeColors } from '@/theme';
 
 export default function LessonScreen() {
   const { data, loading } = useLessons();
   const { isLearned } = useProgress();
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const router = useRouter();
 
   return (
@@ -69,7 +71,7 @@ export default function LessonScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   intro: {
     marginTop: spacing.xs,
     marginBottom: spacing.xl,
