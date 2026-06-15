@@ -122,6 +122,16 @@ export interface LessonWithSteps {
   steps: LessonStep[];
 }
 
+/** Onboarding placement self-assessment. */
+export type Placement = 'beginner' | 'some' | 'can_read';
+
+/** User preferences captured in onboarding. */
+export interface UserSettings {
+  onboarded: boolean;
+  dailyGoalMinutes: number;
+  placement: Placement | null;
+}
+
 /** SM-2 scheduling state for one reviewable item (per user). */
 export interface ReviewState {
   itemType: 'letter' | 'word' | 'lesson';
