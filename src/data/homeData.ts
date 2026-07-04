@@ -1,33 +1,12 @@
 /**
- * Hardcoded placeholder content for the Home screen.
+ * Home tile configuration — the colour-coded topic tiles and where each links.
  *
- * This is the ONLY file that knows the literal values. When the Supabase
- * backend arrives, the content service stops importing from here and starts
- * querying the database instead — the types and the screens never change.
+ * This is static UI config (labels, colours, icons, destinations), not user
+ * data. Live values (XP, streak, counts, next lesson) come from hooks.
  */
 import type { HomeData } from '@/types/content';
 
 export const homeData: HomeData = {
-  progress: {
-    name: 'Pathan',
-    streakDays: 5,
-    level: 2,
-    levelTitle: 'Beginner Reader',
-    xp: 320,
-    xpToNext: 500,
-  },
-  stats: {
-    lettersLearned: 12,
-    wordsLearned: 48,
-    lessonsCompleted: 6,
-  },
-  continueLesson: {
-    id: 'lesson-07',
-    title: 'Sun & Moon Letters',
-    arabicTitle: 'الحروف الشمسية',
-    subtitle: 'Lesson 7 · Reading practice',
-    progress: 0.4,
-  },
   topics: [
     {
       id: 'alphabet',
@@ -35,6 +14,7 @@ export const homeData: HomeData = {
       subtitle: 'The 28 letters',
       icon: 'language-outline',
       tone: 'teal',
+      route: '/course?tab=alphabet',
     },
     {
       id: 'letter-forms',
@@ -42,6 +22,7 @@ export const homeData: HomeData = {
       subtitle: 'Initial · medial · final',
       icon: 'shapes-outline',
       tone: 'saffron',
+      route: '/course?tab=forms',
     },
     {
       id: 'word-breakdown',
@@ -49,6 +30,7 @@ export const homeData: HomeData = {
       subtitle: 'See how words join',
       icon: 'git-merge-outline',
       tone: 'terracotta',
+      route: '/course?tab=breakdown',
     },
     {
       id: 'vocabulary',
@@ -56,13 +38,15 @@ export const homeData: HomeData = {
       subtitle: 'Everyday words',
       icon: 'book-outline',
       tone: 'indigo',
+      route: '/course?tab=vocab',
     },
     {
       id: 'script-lesson',
-      title: 'Script Lesson',
+      title: 'Sentences',
       subtitle: 'Read full sentences',
       icon: 'reader-outline',
       tone: 'aubergine',
+      route: '/sentences',
     },
   ],
 };

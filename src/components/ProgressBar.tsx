@@ -1,9 +1,9 @@
 /**
- * ProgressBar — a rounded track with a gold (or custom) fill.
- * `value` is clamped to 0..1.
+ * ProgressBar — a rounded track with an accent fill.
+ * `value` is clamped to 0..1. Colours default to the active theme.
  */
 import { View, StyleSheet } from 'react-native';
-import { colors, radius } from '@/theme';
+import { useTheme, radius } from '@/theme';
 
 interface ProgressBarProps {
   value: number;
@@ -12,23 +12,19 @@ interface ProgressBarProps {
   height?: number;
 }
 
-export function ProgressBar({
-  value,
-  color = colors.primary,
-  trackColor = colors.well,
-  height = 10,
-}: ProgressBarProps) {
+export function ProgressBar({ value, color, trackColor, height = 10 }: ProgressBarProps) {
+  const { colors } = useTheme();
   const pct = Math.max(0, Math.min(1, value)) * 100;
+  const fill = color ?? colors.primary;
+  const track = trackColor ?? colors.well;
 
   return (
-    <View
-      style={[styles.track, { backgroundColor: trackColor, height, borderRadius: height }]}
-    >
+    <View style={[styles.track, { backgroundColor: track, height, borderRadius: height }]}>
       <View
         style={{
           width: `${pct}%`,
           height: '100%',
-          backgroundColor: color,
+          backgroundColor: fill,
           borderRadius: height,
         }}
       />

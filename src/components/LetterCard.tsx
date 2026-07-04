@@ -11,7 +11,8 @@ import { AppText } from './AppText';
 import { LearnedToggle } from './LearnedToggle';
 import { SpeakerButton } from './SpeakerButton';
 import { playAudio } from '@/services/audioService';
-import { colors, radius, spacing, elevation } from '@/theme';
+import { useSettings } from '@/context/SettingsContext';
+import { useThemedStyles, radius, spacing, elevation, type ThemeColors } from '@/theme';
 import type { Letter } from '@/types/content';
 
 interface LetterCardProps {
@@ -21,6 +22,8 @@ interface LetterCardProps {
 }
 
 export function LetterCard({ letter, learned = false, onToggleLearned }: LetterCardProps) {
+  const { transliterationEnabled } = useSettings();
+  const styles = useThemedStyles(makeStyles);
   const [revealed, setRevealed] = useState(false);
 
   return (
@@ -51,7 +54,7 @@ export function LetterCard({ letter, learned = false, onToggleLearned }: LetterC
             <AppText variant="title" style={styles.lineCenter}>
               {letter.name}
             </AppText>
-            {letter.transliteration ? (
+            {letter.transliteration && transliterationEnabled ? (
               <AppText variant="bodyStrong" color="primary" style={styles.lineCenter}>
                 {letter.transliteration}
               </AppText>
@@ -72,7 +75,7 @@ export function LetterCard({ letter, learned = false, onToggleLearned }: LetterC
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   card: {
     flex: 1,
     marginHorizontal: spacing.xl,

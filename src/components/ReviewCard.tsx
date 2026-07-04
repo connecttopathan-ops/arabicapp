@@ -9,10 +9,12 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { AppText } from './AppText';
 import { useReview } from '@/hooks/useReview';
-import { colors, radius, spacing, elevation, palette } from '@/theme';
+import { useTheme, useThemedStyles, radius, spacing, elevation, type ThemeColors } from '@/theme';
 
 export function ReviewCard() {
   const { dueCount, loading, reload } = useReview();
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const router = useRouter();
 
   useFocusEffect(
@@ -42,7 +44,7 @@ export function ReviewCard() {
         <Ionicons
           name={caughtUp ? 'checkmark-done' : 'sync'}
           size={22}
-          color={caughtUp ? colors.secondary : palette.espresso}
+          color={caughtUp ? colors.accent : colors.textOnAccent}
         />
       </View>
 
@@ -56,13 +58,13 @@ export function ReviewCard() {
       </View>
 
       {dueCount > 0 ? (
-        <Ionicons name="chevron-forward" size={22} color={palette.espresso} />
+        <Ionicons name="chevron-forward" size={22} color={colors.textOnAccent} />
       ) : null}
     </Pressable>
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   card: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -71,7 +73,7 @@ const styles = StyleSheet.create({
     padding: spacing.xl,
   },
   cardDue: {
-    backgroundColor: colors.secondary,
+    backgroundColor: colors.accent,
   },
   cardDone: {
     backgroundColor: colors.card,
@@ -89,7 +91,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   iconDue: {
-    backgroundColor: 'rgba(26,21,18,0.18)',
+    backgroundColor: 'rgba(0,0,0,0.18)',
   },
   iconDone: {
     backgroundColor: colors.well,

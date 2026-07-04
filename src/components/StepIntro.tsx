@@ -8,19 +8,27 @@ import { AppText } from './AppText';
 import { Button } from './Button';
 import { SpeakerButton } from './SpeakerButton';
 import { playAudio } from '@/services/audioService';
-import { colors, radius, spacing } from '@/theme';
+import { useSettings } from '@/context/SettingsContext';
+import { useThemedStyles, radius, spacing, type ThemeColors } from '@/theme';
 import type { LessonStep, Letter, Word } from '@/types/content';
 
 export function StepIntro({ step, onNext }: { step: LessonStep; onNext: () => void }) {
+  const { transliterationEnabled } = useSettings();
+  const styles = useThemedStyles(makeStyles);
   const isLetter = step.itemType === 'letter';
   const letter = isLetter ? (step.item as Letter | null) : null;
   const word = !isLetter ? (step.item as Word | null) : null;
 
   const glyph = letter ? letter.letter : word ? word.arabic : '';
   const title = letter ? letter.name : word?.english ?? '';
+  const translit = transliterationEnabled
+    ? letter
+      ? letter.transliteration
+      : word?.transliteration ?? null
+    : null;
   const sound = letter
-    ? [letter.transliteration, letter.pronunciation].filter(Boolean).join(' · ')
-    : word?.transliteration ?? '';
+    ? [translit, letter.pronunciation].filter(Boolean).join(' · ')
+    : translit ?? '';
 
   function speak() {
     if (!step.item) return;
@@ -57,7 +65,7 @@ export function StepIntro({ step, onNext }: { step: LessonStep; onNext: () => vo
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   wrap: {
     flex: 1,
     justifyContent: 'center',

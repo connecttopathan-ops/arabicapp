@@ -16,13 +16,14 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AppText, ArabicText, Button, TextField } from '@/components';
 import { useAuth } from '@/context/AuthContext';
-import { colors, spacing, layout } from '@/theme';
+import { useThemedStyles, spacing, layout, type ThemeColors } from '@/theme';
 
 type Mode = 'signIn' | 'signUp';
 
 export default function SignInScreen() {
   const insets = useSafeAreaInsets();
   const { signIn, signUp, continueAsGuest } = useAuth();
+  const styles = useThemedStyles(makeStyles);
 
   const [mode, setMode] = useState<Mode>('signIn');
   const [email, setEmail] = useState('');
@@ -126,7 +127,7 @@ export default function SignInScreen() {
             </AppText>
           ) : null}
           {notice ? (
-            <AppText variant="caption" color="secondary" style={styles.message}>
+            <AppText variant="caption" color="accent" style={styles.message}>
               {notice}
             </AppText>
           ) : null}
@@ -169,7 +170,7 @@ export default function SignInScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   flex: {
     flex: 1,
     backgroundColor: colors.background,

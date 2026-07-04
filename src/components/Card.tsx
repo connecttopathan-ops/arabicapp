@@ -5,7 +5,7 @@
  * stack on top of other cards. A thin border keeps edges crisp on dark.
  */
 import { View, type ViewProps, StyleSheet } from 'react-native';
-import { colors, radius, elevation, spacing } from '@/theme';
+import { useThemedStyles, radius, elevation, spacing, type ThemeColors } from '@/theme';
 
 interface CardProps extends ViewProps {
   tone?: 'default' | 'raised';
@@ -19,6 +19,7 @@ export function Card({
   children,
   ...rest
 }: CardProps) {
+  const styles = useThemedStyles(makeStyles);
   return (
     <View
       style={[
@@ -35,7 +36,7 @@ export function Card({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   base: {
     borderRadius: radius.xl,
     borderWidth: StyleSheet.hairlineWidth,

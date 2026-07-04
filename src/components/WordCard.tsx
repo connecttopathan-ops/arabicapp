@@ -14,7 +14,8 @@ import { LearnedToggle } from './LearnedToggle';
 import { SpeakerButton } from './SpeakerButton';
 import { playAudio } from '@/services/audioService';
 import { getExampleSentence } from '@/services/sentenceService';
-import { colors, radius, spacing, elevation } from '@/theme';
+import { useSettings } from '@/context/SettingsContext';
+import { useTheme, useThemedStyles, radius, spacing, elevation, type ThemeColors } from '@/theme';
 import type { Word, Sentence } from '@/types/content';
 
 interface WordCardProps {
@@ -24,6 +25,9 @@ interface WordCardProps {
 }
 
 export function WordCard({ word, learned = false, onToggleLearned }: WordCardProps) {
+  const { transliterationEnabled } = useSettings();
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const [revealed, setRevealed] = useState(false);
   const [showSentence, setShowSentence] = useState(false);
   const [sentence, setSentence] = useState<Sentence | null>(null);
@@ -58,7 +62,7 @@ export function WordCard({ word, learned = false, onToggleLearned }: WordCardPro
 
       {word.cefrLevel ? (
         <View style={styles.chip}>
-          <AppText variant="overline" color="secondary">
+          <AppText variant="overline" color="accent">
             {word.cefrLevel}
           </AppText>
         </View>
@@ -78,7 +82,7 @@ export function WordCard({ word, learned = false, onToggleLearned }: WordCardPro
             <AppText variant="title" style={styles.lineCenter}>
               {word.english ?? '—'}
             </AppText>
-            {word.transliteration ? (
+            {word.transliteration && transliterationEnabled ? (
               <AppText variant="bodyStrong" color="primary" style={styles.lineCenter}>
                 {word.transliteration}
               </AppText>
@@ -91,7 +95,7 @@ export function WordCard({ word, learned = false, onToggleLearned }: WordCardPro
 
             {!showSentence ? (
               <Pressable onPress={revealSentence} hitSlop={6} style={styles.sentenceLink}>
-                <AppText variant="label" color="secondary">
+                <AppText variant="label" color="accent">
                   See it in a sentence
                 </AppText>
               </Pressable>
@@ -102,7 +106,7 @@ export function WordCard({ word, learned = false, onToggleLearned }: WordCardPro
                 <ArabicText variant="arabicBody" center>
                   {sentence.arabic}
                 </ArabicText>
-                {sentence.transliteration ? (
+                {sentence.transliteration && transliterationEnabled ? (
                   <AppText variant="caption" color="textMuted" style={styles.lineCenter}>
                     {sentence.transliteration}
                   </AppText>
@@ -134,7 +138,7 @@ export function WordCard({ word, learned = false, onToggleLearned }: WordCardPro
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   card: {
     flex: 1,
     marginHorizontal: spacing.xl,

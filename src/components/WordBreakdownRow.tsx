@@ -7,10 +7,12 @@ import { Pressable, View, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ArabicText } from './ArabicText';
 import { AppText } from './AppText';
-import { colors, radius, spacing } from '@/theme';
+import { useTheme, useThemedStyles, radius, spacing, type ThemeColors } from '@/theme';
 import type { WordBreakdown } from '@/types/content';
 
 export function WordBreakdownRow({ item }: { item: WordBreakdown }) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const [expanded, setExpanded] = useState(false);
 
   return (
@@ -65,7 +67,7 @@ export function WordBreakdownRow({ item }: { item: WordBreakdown }) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   card: {
     backgroundColor: colors.card,
     borderRadius: radius.lg,

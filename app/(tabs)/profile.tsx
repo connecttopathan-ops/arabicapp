@@ -1,73 +1,69 @@
 /**
- * Profile tab — account summary and sign-out.
- * Full stats/settings come later; for now it shows who you're signed in as
- * (or guest) and lets you sign out.
+ * Profile tab — account summary, daily goal, and a link into Settings.
  */
-import { View, StyleSheet } from 'react-native';
+import { View, Pressable, StyleSheet } from 'react-native';
+import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Screen, AppText, Button, Card } from '@/components';
+import { Screen, AppText, Card } from '@/components';
 import { useAuth } from '@/context/AuthContext';
 import { useSettings } from '@/context/SettingsContext';
-import { colors, spacing, radius } from '@/theme';
+import { useTheme, useThemedStyles, spacing, radius, type ThemeColors } from '@/theme';
 
 export default function ProfileScreen() {
-  const { user, isGuest, signOut } = useAuth();
-  const { dailyGoalMinutes } = useSettings();
+  const router = useRouter();
+  const { user, isGuest } = useAuth();
+  const { dailyGoalMinutes, reminderEnabled } = useSettings();
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
 
   const displayName = isGuest ? 'Guest' : user?.email ?? 'Signed in';
-  const subtitle = isGuest
-    ? 'You’re exploring without an account'
-    : 'Signed in with email';
+  const subtitle = isGuest ? 'You’re exploring without an account' : 'Signed in with email';
 
   return (
-    <Screen scroll={false}>
+    <Screen>
       <View style={styles.header}>
         <View style={styles.avatar}>
-          <Ionicons
-            name={isGuest ? 'person-outline' : 'person'}
-            size={32}
-            color={colors.primary}
-          />
+          <Ionicons name={isGuest ? 'person-outline' : 'person'} size={32} color={colors.primary} />
         </View>
-        <AppText variant="title" style={styles.name} numberOfLines={1}>
+        <AppText variant="title" style={styles.center} numberOfLines={1}>
           {displayName}
         </AppText>
-        <AppText variant="body" color="textMuted" style={styles.subtitle}>
+        <AppText variant="body" color="textMuted" style={styles.center}>
           {subtitle}
         </AppText>
       </View>
 
       <Card style={styles.goalCard}>
-        <View style={styles.goalRow}>
-          <Ionicons name="flag-outline" size={20} color={colors.secondary} />
+        <View style={styles.row}>
+          <Ionicons name="flag-outline" size={20} color={colors.accent} />
           <AppText variant="bodyStrong">Daily goal</AppText>
         </View>
         <AppText variant="body" color="textMuted">
-          {dailyGoalMinutes} minutes a day
+          {dailyGoalMinutes} minutes a day · reminders {reminderEnabled ? 'on' : 'off'}
         </AppText>
       </Card>
 
-      {isGuest ? (
-        <Card style={styles.guestCard}>
-          <AppText variant="bodyStrong">Save your progress</AppText>
-          <AppText variant="caption" color="textMuted">
-            Create a free account to keep your streak and progress across devices.
-          </AppText>
-          <Button label="Sign out & create account" variant="secondary" onPress={signOut} />
-        </Card>
-      ) : (
-        <Button label="Sign out" variant="secondary" onPress={signOut} />
-      )}
+      <Pressable
+        onPress={() => router.push('/settings')}
+        accessibilityRole="button"
+        style={({ pressed }) => [styles.settingsRow, pressed && styles.pressed]}
+      >
+        <Ionicons name="settings-outline" size={20} color={colors.accent} />
+        <AppText variant="bodyStrong" style={styles.settingsLabel}>
+          Settings
+        </AppText>
+        <Ionicons name="chevron-forward" size={20} color={colors.textFaint} />
+      </Pressable>
     </Screen>
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   header: {
     alignItems: 'center',
     gap: spacing.xs,
-    marginTop: spacing['3xl'],
-    marginBottom: spacing['3xl'],
+    marginTop: spacing.xl,
+    marginBottom: spacing['2xl'],
   },
   avatar: {
     width: 80,
@@ -80,22 +76,32 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: spacing.sm,
   },
-  name: {
+  center: {
     textAlign: 'center',
   },
-  subtitle: {
-    textAlign: 'center',
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
   },
   goalCard: {
     gap: spacing.xs,
     marginBottom: spacing.lg,
   },
-  goalRow: {
+  settingsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
-  },
-  guestCard: {
     gap: spacing.md,
+    backgroundColor: colors.card,
+    borderRadius: radius.lg,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.border,
+    padding: spacing.lg,
+  },
+  pressed: {
+    opacity: 0.9,
+  },
+  settingsLabel: {
+    flex: 1,
   },
 });

@@ -6,7 +6,7 @@ import { View, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Card } from './Card';
 import { AppText } from './AppText';
-import { colors, spacing, radius } from '@/theme';
+import { useTheme, spacing, radius } from '@/theme';
 import type { IconName } from '@/types/content';
 
 interface StatCardProps {
@@ -16,11 +16,12 @@ interface StatCardProps {
   accent?: string;
 }
 
-export function StatCard({ icon, value, label, accent = colors.primary }: StatCardProps) {
+export function StatCard({ icon, value, label, accent }: StatCardProps) {
+  const { colors } = useTheme();
   return (
     <Card style={styles.card} padded={false}>
       <View style={[styles.iconChip, { backgroundColor: colors.well }]}>
-        <Ionicons name={icon} size={18} color={accent} />
+        <Ionicons name={icon} size={18} color={accent ?? colors.primary} />
       </View>
       <AppText variant="statNumber">{value}</AppText>
       <AppText variant="caption" color="textMuted">

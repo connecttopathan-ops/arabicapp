@@ -7,7 +7,7 @@
  */
 import { Pressable, StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, radius } from '@/theme';
+import { useTheme, useThemedStyles, radius, type ThemeColors } from '@/theme';
 
 interface LearnedToggleProps {
   learned: boolean;
@@ -16,6 +16,8 @@ interface LearnedToggleProps {
 }
 
 export function LearnedToggle({ learned, onPress, style }: LearnedToggleProps) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   return (
     <Pressable
       onPress={onPress}
@@ -35,7 +37,7 @@ export function LearnedToggle({ learned, onPress, style }: LearnedToggleProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   base: {
     width: 24,
     height: 24,

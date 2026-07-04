@@ -49,13 +49,13 @@ export interface Topic {
   subtitle: string;
   icon: IconName;
   tone: JewelTone;
+  /** Where tapping the tile navigates (e.g. "/course?tab=vocab"). */
+  route: string;
 }
 
-/** The full payload the Home screen needs. One fetch, everything below. */
+/** Static config the Home screen needs (tile definitions). Live data (XP,
+ *  streak, counts, next lesson) comes from hooks, not here. */
 export interface HomeData {
-  progress: UserProgress;
-  stats: StatSummary;
-  continueLesson: ContinueLesson;
   topics: Topic[];
 }
 
@@ -125,11 +125,19 @@ export interface LessonWithSteps {
 /** Onboarding placement self-assessment. */
 export type Placement = 'beginner' | 'some' | 'can_read';
 
+export type ThemePreference = 'dark' | 'light';
+
 /** User preferences captured in onboarding. */
 export interface UserSettings {
   onboarded: boolean;
   dailyGoalMinutes: number;
   placement: Placement | null;
+  reminderEnabled: boolean;
+  reminderHour: number;
+  reminderMinute: number;
+  transliterationEnabled: boolean;
+  audioEnabled: boolean;
+  theme: ThemePreference;
 }
 
 /** SM-2 scheduling state for one reviewable item (per user). */

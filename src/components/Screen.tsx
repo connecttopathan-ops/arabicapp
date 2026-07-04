@@ -6,7 +6,7 @@
 import type { ReactNode } from 'react';
 import { View, ScrollView, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, layout, spacing } from '@/theme';
+import { useThemedStyles, layout, spacing, type ThemeColors } from '@/theme';
 
 interface ScreenProps {
   children: ReactNode;
@@ -17,6 +17,7 @@ interface ScreenProps {
 
 export function Screen({ children, scroll = true, contentBottomPadding = spacing['4xl'] }: ScreenProps) {
   const insets = useSafeAreaInsets();
+  const styles = useThemedStyles(makeStyles);
 
   const padding = {
     paddingTop: insets.top + spacing.lg,
@@ -39,7 +40,7 @@ export function Screen({ children, scroll = true, contentBottomPadding = spacing
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   root: {
     flex: 1,
     backgroundColor: colors.background,

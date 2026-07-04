@@ -12,7 +12,7 @@ import { AppText } from './AppText';
 import { Button } from './Button';
 import { SpeakerButton } from './SpeakerButton';
 import { playAudio } from '@/services/audioService';
-import { colors, radius, spacing } from '@/theme';
+import { useThemedStyles, radius, spacing, type ThemeColors } from '@/theme';
 import type { LessonStep, StepOption } from '@/types/content';
 
 export function StepChoice({
@@ -26,6 +26,7 @@ export function StepChoice({
    *  answered state so it can reveal the answer. Replaces the default prompt. */
   renderHeader?: (answered: boolean) => ReactNode;
 }) {
+  const styles = useThemedStyles(makeStyles);
   const isListen = step.type === 'listen_choose';
   const options = step.options ?? [];
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -111,7 +112,7 @@ export function StepChoice({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   wrap: {
     flex: 1,
     justifyContent: 'center',

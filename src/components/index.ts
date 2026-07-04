@@ -24,3 +24,6 @@ export { StepChoice } from './StepChoice';
 export { LessonComplete } from './LessonComplete';
 export { ReviewCard } from './ReviewCard';
 export { ClozeSentence } from './ClozeSentence';
+export { NotificationsManager } from './NotificationsManager';
+export { NotificationPrompt } from './NotificationPrompt';
+export { ErrorBoundary } from './ErrorBoundary';

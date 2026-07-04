@@ -17,13 +17,15 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { ProgressProvider } from '@/context/ProgressContext';
 import { SettingsProvider, useSettings } from '@/context/SettingsContext';
-import { colors, fontAssets } from '@/theme';
+import { NotificationsManager, ErrorBoundary } from '@/components';
+import { ThemeProvider, useTheme, fontAssets } from '@/theme';
 
 SplashScreen.preventAutoHideAsync();
 
 function RootNavigator() {
   const { isAuthed, initializing } = useAuth();
   const { onboarded, loading: settingsLoading } = useSettings();
+  const { colors, mode } = useTheme();
   const segments = useSegments();
   const router = useRouter();
 
@@ -54,19 +56,24 @@ function RootNavigator() {
   }, [isAuthed, initializing, onboarded, settingsLoading, segments, router]);
 
   return (
-    <Stack
-      screenOptions={{
-        headerShown: false,
-        contentStyle: { backgroundColor: colors.background },
-      }}
-    >
-      <Stack.Screen name="onboarding" />
-      <Stack.Screen name="(auth)" />
-      <Stack.Screen name="(tabs)" />
-      <Stack.Screen name="play/[id]" options={{ animation: 'slide_from_bottom' }} />
-      <Stack.Screen name="review" options={{ animation: 'slide_from_bottom' }} />
-      <Stack.Screen name="sentences" options={{ animation: 'slide_from_bottom' }} />
-    </Stack>
+    <>
+      <StatusBar style={mode === 'light' ? 'dark' : 'light'} />
+      <NotificationsManager />
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          contentStyle: { backgroundColor: colors.background },
+        }}
+      >
+        <Stack.Screen name="onboarding" />
+        <Stack.Screen name="(auth)" />
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="settings" options={{ animation: 'slide_from_right' }} />
+        <Stack.Screen name="play/[id]" options={{ animation: 'slide_from_bottom' }} />
+        <Stack.Screen name="review" options={{ animation: 'slide_from_bottom' }} />
+        <Stack.Screen name="sentences" options={{ animation: 'slide_from_bottom' }} />
+      </Stack>
+    </>
   );
 }
 
@@ -80,16 +87,19 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
+      <ErrorBoundary>
       <SafeAreaProvider>
         <AuthProvider>
           <SettingsProvider>
-            <ProgressProvider>
-              <StatusBar style="light" />
-              <RootNavigator />
-            </ProgressProvider>
+            <ThemeProvider>
+              <ProgressProvider>
+                <RootNavigator />
+              </ProgressProvider>
+            </ThemeProvider>
           </SettingsProvider>
         </AuthProvider>
       </SafeAreaProvider>
+      </ErrorBoundary>
     </GestureHandlerRootView>
   );
 }

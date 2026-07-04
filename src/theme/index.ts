@@ -1,32 +1,21 @@
 /**
- * The MASAR design system, in one import.
+ * The MASAR design system.
  *
- *   import { theme } from '@/theme';
- *   ...style={{ color: theme.colors.primary }}
+ * Colours are themeable — read them at render time:
+ *   const { colors } = useTheme();
+ *   const styles = useThemedStyles((colors) => StyleSheet.create({ ... }));
  *
- * or pull individual token groups:
- *
- *   import { colors, spacing, typography } from '@/theme';
+ * Spacing / radius / elevation / typography are theme-independent and imported
+ * statically as before.
  */
-export { colors, palette, jewel } from './colors';
-export type { JewelTone } from './colors';
+export {
+  darkColors,
+  lightColors,
+  jewelDark,
+  jewelLight,
+} from './colors';
+export type { ThemeColors, ColorKey, JewelTone, JewelSet, JewelToneColors } from './colors';
+export { ThemeProvider, useTheme, useThemedStyles } from './ThemeContext';
 export { typography, family, preset } from './typography';
 export { spacing, radius, elevation, layout } from './layout';
 export { fontAssets } from './fonts';
-
-import { colors, palette, jewel } from './colors';
-import { typography } from './typography';
-import { spacing, radius, elevation, layout } from './layout';
-
-export const theme = {
-  colors,
-  palette,
-  jewel,
-  typography,
-  spacing,
-  radius,
-  elevation,
-  layout,
-} as const;
-
-export type Theme = typeof theme;
