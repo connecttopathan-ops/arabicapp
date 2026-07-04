@@ -20,6 +20,7 @@ import {
   AppText,
 } from '@/components';
 import { useHomeData } from '@/hooks/useHomeData';
+import { useLessons } from '@/hooks/useContent';
 import { useProgress } from '@/context/ProgressContext';
 import { useStats } from '@/hooks/useStats';
 import { useAuth } from '@/context/AuthContext';
@@ -34,7 +35,8 @@ function displayName(email: string | undefined | null): string {
 
 export default function HomeScreen() {
   const { data, loading, error } = useHomeData();
-  const { learnedCount } = useProgress();
+  const { learnedCount, isLearned } = useProgress();
+  const lessons = useLessons();
   const stats = useStats();
   const { session, isGuest } = useAuth();
   const { colors } = useTheme();
@@ -59,7 +61,12 @@ export default function HomeScreen() {
     );
   }
 
-  const { continueLesson, topics } = data;
+  const { topics } = data;
+
+  // Next lesson to continue = first not-yet-completed lesson (by order).
+  const completedLessons = lessons.data.filter((l) => isLearned('lesson', l.id)).length;
+  const nextLesson = lessons.data.find((l) => !isLearned('lesson', l.id)) ?? null;
+  const courseProgress = lessons.data.length > 0 ? completedLessons / lessons.data.length : 0;
 
   const heroProgress: UserProgress = {
     name: isGuest ? 'Guest' : displayName(session?.user?.email),
@@ -104,19 +111,30 @@ export default function HomeScreen() {
         <StatCard icon="checkmark-done-outline" value={learnedCount('lesson')} label="Lessons" />
       </View>
 
-      <View style={styles.section}>
-        <ContinueBanner
-          lesson={continueLesson}
-          onPress={() => router.push('/lesson')}
-        />
-      </View>
+      {nextLesson ? (
+        <View style={styles.section}>
+          <ContinueBanner
+            lesson={{
+              id: nextLesson.id,
+              title: nextLesson.title,
+              arabicTitle: '',
+              subtitle:
+                completedLessons > 0
+                  ? `${completedLessons} of ${lessons.data.length} lessons done`
+                  : nextLesson.subtitle ?? 'Start your first lesson',
+              progress: courseProgress,
+            }}
+            onPress={() => router.push(`/play/${nextLesson.id}`)}
+          />
+        </View>
+      ) : null}
 
       <View style={styles.section}>
         <SectionHeader title="Topics" actionLabel="See all" onActionPress={() => router.push('/course')} />
         <View style={styles.grid}>
           {topics.map((topic) => (
             <View key={topic.id} style={styles.gridItem}>
-              <TopicTile topic={topic} onPress={() => router.push('/lesson')} />
+              <TopicTile topic={topic} onPress={() => router.push(topic.route as any)} />
             </View>
           ))}
         </View>

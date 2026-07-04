@@ -49,13 +49,13 @@ export interface Topic {
   subtitle: string;
   icon: IconName;
   tone: JewelTone;
+  /** Where tapping the tile navigates (e.g. "/course?tab=vocab"). */
+  route: string;
 }
 
-/** The full payload the Home screen needs. One fetch, everything below. */
+/** Static config the Home screen needs (tile definitions). Live data (XP,
+ *  streak, counts, next lesson) comes from hooks, not here. */
 export interface HomeData {
-  progress: UserProgress;
-  stats: StatSummary;
-  continueLesson: ContinueLesson;
   topics: Topic[];
 }
 

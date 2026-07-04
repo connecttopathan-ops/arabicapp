@@ -5,7 +5,7 @@
  *   - Word Breakdown        : tap a word to split it into glyph-pieces (RTL).
  * All content is read from Supabase (offline-cached); nothing hardcoded.
  */
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   View,
   FlatList,
@@ -19,6 +19,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useLocalSearchParams } from 'expo-router';
 import {
   AppText,
   ArabicText,
@@ -58,10 +59,20 @@ export default function CourseScreen() {
   const { placement } = useSettings();
   const { colors } = useTheme();
   const styles = useThemedStyles(makeStyles);
+  const params = useLocalSearchParams<{ tab?: string }>();
 
   // Start readers on Vocabulary, beginners on the Alphabet (from onboarding).
   const [tab, setTab] = useState<Tab>(placement === 'can_read' ? 'vocab' : 'alphabet');
   const [index, setIndex] = useState(0);
+
+  // Deep link from Home topic tiles (e.g. /course?tab=forms).
+  useEffect(() => {
+    const t = params.tab;
+    if (t && (t === 'alphabet' || t === 'vocab' || t === 'forms' || t === 'breakdown')) {
+      setTab(t);
+      setIndex(0);
+    }
+  }, [params.tab]);
 
   const active =
     tab === 'alphabet' ? letters : tab === 'vocab' ? words : tab === 'forms' ? forms : breakdowns;
