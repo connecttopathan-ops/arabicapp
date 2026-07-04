@@ -17,7 +17,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { ProgressProvider } from '@/context/ProgressContext';
 import { SettingsProvider, useSettings } from '@/context/SettingsContext';
-import { NotificationsManager } from '@/components';
+import { NotificationsManager, ErrorBoundary } from '@/components';
 import { ThemeProvider, useTheme, fontAssets } from '@/theme';
 
 SplashScreen.preventAutoHideAsync();
@@ -87,6 +87,7 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
+      <ErrorBoundary>
       <SafeAreaProvider>
         <AuthProvider>
           <SettingsProvider>
@@ -98,6 +99,7 @@ export default function RootLayout() {
           </SettingsProvider>
         </AuthProvider>
       </SafeAreaProvider>
+      </ErrorBoundary>
     </GestureHandlerRootView>
   );
 }

@@ -9,15 +9,20 @@
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 
-// Show reminders even when the app is foregrounded.
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowBanner: true,
-    shouldShowList: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-  }),
-});
+// Show reminders even when the app is foregrounded. Guarded so a module-load
+// failure can never crash app startup.
+try {
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowBanner: true,
+      shouldShowList: true,
+      shouldPlaySound: true,
+      shouldSetBadge: false,
+    }),
+  });
+} catch {
+  // ignore — notifications simply won't show a foreground banner
+}
 
 const CHANNEL_ID = 'reminders';
 
